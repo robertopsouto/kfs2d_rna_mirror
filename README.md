@@ -1,4 +1,4 @@
-Modelo de água rasa 2D com assimilação por Filtro de Kalman
+Modelo de água rasa 2D com assimilação por Filtro de Kalman, e também emulado por RNA
 
 Uso: \
 ```./KFS2d assimType gridX gridY timeStep freqObsT freqObsX freqObsY neuronNumber ```
