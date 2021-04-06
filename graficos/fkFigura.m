@@ -1,0 +1,46 @@
+%--------------------------------------------------------------------------
+% programa para plotar os graficos para a tese
+%--------------------------------------------------------------------------
+clear all; 
+close all; clc;
+%-----------------------
+%leitura dos dados
+%-----------------------
+qm = load('../output/full/qModelExpA.out');
+%qo = load('../EA_200517_2000/FK/qObservExpA.out');
+qa = load('../output/full/qAnalysisExpA.out');
+% dado da rede
+qar = load('../output/full/qAnalysisExpA_RNA.out');
+%
+ni = 10;
+nj = ni;
+nk = 60;
+%
+ninj = ni*nj;
+p = 7; % ponto
+%
+% dado do modelo
+qm3D = reshape(qm,ni,nj,nk);
+qpm10 = qm3D(p,p,:);
+qpm10v = qpm10(:);
+%
+%valor estimado pelo Filtro de Kalman
+qafk3D = reshape(qa,ni,nj,nk);
+qpa10 = qafk3D(p,p,:);
+qpa10v = qpa10(:);
+%
+%estimado pela Rede Neural
+ qr3D = reshape(qar,ni,nj,nk);
+ qpr10 = qr3D(p,p,:);
+ qpr10v = qpr10(:);
+%
+figure(1)
+plot(qpm10v,'b','linewidth',2); hold on;
+plot(qpa10v,'r','linewidth',2);
+plot(qpr10v,'g','linewidth',2);
+title('variavel q'); grid on;
+xlabel('tempo');
+ylabel('q(7,7)');
+legend('verdade','FK','RNA')
+axis([1 60 -60 80])
+print -depsc variavelqp77ExpA.eps
