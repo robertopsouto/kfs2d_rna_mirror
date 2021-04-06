@@ -244,8 +244,13 @@ vGl = 0.0
 !**************************************************************************************
 ! Storing the time spent
 call CPU_TIME(initialProcessTime)
-open(40, file='output/computingFKTime.out')
-!open(40, file='output/computingANNTime.out')
+if (assimType .eq. 1) then !Assimilacao com FK
+   open(40, file='output/computingFKTime.out')
+endif
+if (assimType .eq. 2) then !Assimilacao com RNA
+   open(40, file='output/computingANNTime.out')
+endif
+
 
 !**************************************************************************************
 ! Parametros usados quando assimType = 2 --> Rede Neural
