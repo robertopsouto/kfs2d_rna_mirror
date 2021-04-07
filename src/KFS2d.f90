@@ -325,17 +325,14 @@ ALLOCATE(vAnalysisnorm(gridX,gridY,timeStep))
 if (assimType .eq. 2) then !Assimilacao com RNA
 	!Reading the weights files and bias for Neural Network
 	open(10, file = './data/wqcoExpA.dat')
-	do i = 1,neuronNumber
-    		read(10,*)(wqco(i,j),j = 1,2)
+	do j = 1, 2
+    		read(10,*)(wqco(i,j),i = 1,neuronNumber)
 	enddo
 	close(10)
 
 	open(10, file = './data/bqcoExpA.dat')
-	    read(10,*)(bqcoAux(1,j),j = 1, neuronNumber)
+	    read(10,*)(bqco(i,1),i = 1, neuronNumber)
 	close(10)
-	do i = 1,neuronNumber
-    		bqco(i,1)=bqcoAux(1,i)
-	enddo	
 
 	open(10, file = './data/wqcsExpA.dat')
 	    read(10,*)(wqcs(1,j),j = 1,neuronNumber)
