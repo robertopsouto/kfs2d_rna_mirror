@@ -1,4 +1,4 @@
-Modelo de água rasa 2D com assimilação por Filtro de Kalman, e também emulado por RNA.
+Modelo de água rasa 2D com assimilação de dados por Filtro de Kalman, emulado por RNA.
 
 Uso: \
 ```./run-KFS2d.sh assimType gridX gridY timeStep freqObsT freqObsX freqObsY neuronNumber ```
