@@ -13,7 +13,7 @@ qar = load('qAnalysisExpA_RNA.out');
 %
 ni = 10;
 nj = ni;
-nk = 60;
+nk = 100;
 %
 ninj = ni*nj;
 p = 7; % ponto
@@ -41,5 +41,5 @@ title('variavel q'); grid on;
 xlabel('tempo');
 ylabel('q(7,7)');
 legend('verdade','FK','RNA')
-axis([1 60 -60 80])
+axis([1 100 -60 80])
 print -depsc variavelqp77ExpA.eps
