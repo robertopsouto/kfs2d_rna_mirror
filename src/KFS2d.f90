@@ -159,15 +159,21 @@ character(len=6) :: assimType_char, gridX_char, gridY_char, timeStep_char
 character(len=6) :: freqObsT_char, freqObsX_char, freqObsY_char, percNoise_char
 character(len=6) :: neuronNumber_char
 
- call getarg(1,assimType_char)
- call getarg(2,gridX_char)
- call getarg(3,gridY_char)
- call getarg(4,timeStep_char)
- call getarg(5,freqObsT_char)
- call getarg(6,freqObsX_char)
- call getarg(7,freqObsY_char)
- call getarg(8,percNoise_char)
- call getarg(9,neuronNumber_char)
+CHARACTER(len=255) :: cmd
+CALL get_command(cmd)
+WRITE (*,*) TRIM(cmd)
+
+print*,"command_argument_count(): ",command_argument_count()
+
+ call get_command_argument(1,assimType_char)
+ call get_command_argument(2,gridX_char)
+ call get_command_argument(3,gridY_char)
+ call get_command_argument(4,timeStep_char)
+ call get_command_argument(5,freqObsT_char)
+ call get_command_argument(6,freqObsX_char)
+ call get_command_argument(7,freqObsY_char)
+ call get_command_argument(8,percNoise_char)
+ call get_command_argument(9,neuronNumber_char)
 
 print*, "freqObsX: ", freqObsX_char
 print*, "freqObsY: ", freqObsY_char
