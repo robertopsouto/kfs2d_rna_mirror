@@ -4,7 +4,7 @@
 !***********************************************************************
 
 MODULE KfsFunctions
-    use Globais
+!    use Globais
 
 CONTAINS
 
@@ -12,20 +12,23 @@ CONTAINS
     ! Traducao da funcao droplet e ndgrid do Matlab para o Fortran
     !SUBROUTINE droplet(height,width,Dd)
     !***********************************************************************
-    SUBROUTINE droplet(height,width)
+    SUBROUTINE droplet(height,width,D)
         IMPLICIT NONE
+        integer, intent(in) :: height, width
+        double precision, intent(inout) :: D(:,:)
+        
         real, allocatable, dimension(:,:) :: x, y
-        real, allocatable, dimension(:,:) :: Dd
+        !real, allocatable, dimension(:,:) :: Dd
 
         real count
-        integer :: height, width
+        
         integer :: i, j
 
         count = -1.0
 
         allocate(x(width,width))
         allocate(y(width,width))
-        allocate(Dd(width,width))
+        !allocate(Dd(width,width))
 
         do j = 1, width !j = coluna
             do i = 1, width !i = linha
@@ -36,13 +39,13 @@ CONTAINS
 
         y = transpose(x)
 
-        Dd = real(height)*exp(-5*(x**2+y**2)) !para todas as linha da coluna j
+        D = real(height)*exp(-5*(x**2+y**2)) !para todas as linha da coluna j
 
-        D = Dd
+        !D = Dd
 
         deallocate(x)
         deallocate(y)
-        deallocate(Dd)
+        !deallocate(Dd)
 
     END SUBROUTINE !droplet
 
@@ -50,14 +53,15 @@ CONTAINS
     ! Traducao da funcao modelo2D do Matlab para o Fortran
     !SUBROUTINE model2d(dx,dy,dt,ni,nj,nk,q,u,v,Hmean,rq,ru,rv,f,g)
     !***********************************************************************
-    SUBROUTINE model2d(dx, dy, dt, ni, nj, Hmean, rq, ru, rv, f, g)
+    SUBROUTINE model2d(dx, dy, dt, ni, nj, Hmean, rq, ru, rv, f, g, qGl, uGl, vGl)
         IMPLICIT NONE
-        integer :: i, j
-        integer :: ni, nj
-        integer :: dt, Hmean
-
-        double precision :: dx, dy
-        double precision :: rq, ru, rv, f, g
+        double precision :: dx, dy        
+        integer, intent(in) :: dt
+        integer, intent(in) :: ni, nj
+        integer, intent(in) :: Hmean
+        double precision, intent(in) :: rq, ru, rv, f, g
+        double precision, intent(inout) :: qGl(:,:), uGl(:,:), vGl(:,:)
+        
         double precision :: rho_a, rho_w
         double precision :: cx, cy
         double precision :: Cd
@@ -67,6 +71,8 @@ CONTAINS
         double precision, allocatable, dimension(:,:) :: divx, divy
         double precision, allocatable, dimension(:,:) :: dqdx, dqdy, aux
         double precision, allocatable, dimension(:,:) :: ubar, vbar
+        
+        integer :: i, j
 
         allocate(divx(ni,nj))
         allocate(divy(ni,nj))

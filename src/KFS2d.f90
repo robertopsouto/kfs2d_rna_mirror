@@ -61,7 +61,7 @@ PROGRAM KFShallow2D
 !****************************************************************************************
 !****************************************************************************************
 USE KfsFunctions
-USE Globais
+!USE Globais
 
 !****************************************************************************************
 ! Variables definition
@@ -83,6 +83,7 @@ INTEGER :: assimType    !1-Kalman Filter, 2-ANN
 INTEGER :: numPattern
 INTEGER :: neuronNumber
 
+REAL*8  :: percNoise
 REAL*8  :: dX, dY
 REAL*8  :: qDampCoeff, uDampCoeff, vDampCoeff
 REAL*8  :: coriolis
@@ -98,6 +99,16 @@ REAL*8  :: initialProcessTime, endProcessTime, totalProcessTime
 REAL*8  :: a
 REAL*8  :: valNormInf, valNormSup
 !REAL*8  :: maxXann, minXann
+
+!INTEGER, PARAMETER  :: X    = 10
+!INTEGER, PARAMETER  :: Y    = 10
+!DOUBLE PRECISION, DIMENSION(X,Y)      :: D
+!DOUBLE PRECISION, DIMENSION(X,Y)      :: qGl, uGl, vGl !Nomes com terminacao Gl para enfatizar que eh Global
+!DOUBLE PRECISION, DIMENSION(3*X*Y,3*X*Y)  :: matrixGl, matrixInvGl
+
+DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: D
+DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: qGl, uGl, vGl
+DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: matrixGl, matrixInvGl
 
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:,:) :: qModelnorm
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:,:) :: uModelnorm
@@ -145,7 +156,8 @@ DOUBLE PRECISION :: qModelMax, qModelMin
 
 character(len=7) :: fnametemp
 character(len=6) :: assimType_char, gridX_char, gridY_char, timeStep_char
-character(len=6) :: freqObsT_char, freqObsX_char, freqObsY_char, neuronNumber_char
+character(len=6) :: freqObsT_char, freqObsX_char, freqObsY_char, percNoise_char
+character(len=6) :: neuronNumber_char
 
  call getarg(1,assimType_char)
  call getarg(2,gridX_char)
@@ -154,18 +166,29 @@ character(len=6) :: freqObsT_char, freqObsX_char, freqObsY_char, neuronNumber_ch
  call getarg(5,freqObsT_char)
  call getarg(6,freqObsX_char)
  call getarg(7,freqObsY_char)
- call getarg(8,neuronNumber_char)
- 
+ call getarg(8,percNoise_char)
+ call getarg(9,neuronNumber_char)
 
- assimType_char=trim(assimType_char)
- gridX_char=trim(gridX_char)
- gridY_char=trim(gridY_char)
- timeStep_char=trim(timeStep_char)
- freqObsT_char=trim(freqObsT_char)
- freqObsX_char=trim(freqObsX_char)
- freqObsY_char=trim(freqObsY_char)
- neuronNumber_char=trim(neuronNumber_char)
+print*, "freqObsX: ", freqObsX_char
+print*, "freqObsY: ", freqObsY_char
+print*, "percNoise: ", percNoise_char
+print*, "neuronNumber: ", neuronNumber_char 
 
+assimType_char=trim(assimType_char)
+gridX_char=trim(gridX_char)
+gridY_char=trim(gridY_char)
+timeStep_char=trim(timeStep_char)
+freqObsT_char=trim(freqObsT_char)
+freqObsX_char=trim(freqObsX_char)
+freqObsY_char=trim(freqObsY_char)
+percNoise_char=trim(percNoise_char)
+neuronNumber_char=trim(neuronNumber_char)
+
+
+! print*, "freqObsX: ", freqObsX_char
+! print*, "freqObsY: ", freqObsY_char
+! print*, "percNoise: ", percNoise_char
+! print*, "neuronNumber: ", neuronNumber_char
 
 fnametemp = 'temp.dat'
 write (fnametemp,*) assimType_char
@@ -182,9 +205,18 @@ write (fnametemp,*) freqObsX_char
 read (fnametemp,*) freqObsX
 write (fnametemp,*) freqObsY_char
 read (fnametemp,*) freqObsY
+write (fnametemp,*) percNoise_char
+read (fnametemp,*) percNoise
 write (fnametemp,*) neuronNumber_char
 read (fnametemp,*) neuronNumber
 
+
+ALLOCATE(D(gridX,gridY))
+ALLOCATE(qGl(gridX,gridY))
+ALLOCATE(uGl(gridX,gridY))
+ALLOCATE(vGl(gridX,gridY))
+ALLOCATE(matrixGl(3*gridX*gridY,3*gridX*gridY))
+ALLOCATE(matrixInvGl(3*gridX*gridY,3*gridX*gridY))
 
 ! Initialization of variables/parameters
 dX = 100.0d3
@@ -357,7 +389,7 @@ vObserv = 0.0
 !**************************************************************************************
 ! Initial Condition
 dropStep = 5
-call droplet(dropStep,gridX) ! Simulate a water drop
+call droplet(dropStep,gridX,D) ! Simulate a water drop
 
 !**************************************************************************************
 !Foi comentado este trecho para validar o teste com matlab,
@@ -400,7 +432,7 @@ vGl = vInitialCond
 !**************************************************************************************
 !Integrando o modelo no tempo
 do tS = 1, timeStep
-    call model2d(dX, dY, dT, gridX, gridY, hFluidMean, qDampCoeff, uDampCoeff, vDampCoeff, coriolis, gravityConst)
+    call model2d(dX, dY, dT, gridX, gridY, hFluidMean, qDampCoeff, uDampCoeff, vDampCoeff, coriolis, gravityConst, qGl, uGl, vGl)
     qModel(:,:,tS) = qGl
     uModel(:,:,tS) = uGl
     vModel(:,:,tS) = vGl
@@ -432,9 +464,9 @@ do sY = 1, gridY
         do tS = 1, timeStep
             randNoise = 2*rand()-1
             !randNoiseObserv(sX,sY,tS) = randNoise * sqrt(0.01)
-            qObserv(sX,sY,tS) = qModel(sX,sY,tS) + 0.2*qModel(sX,sY,tS)*randNoise 
-            uObserv(sX,sY,tS) = uModel(sX,sY,tS) + 0.2*uModel(sX,sY,tS)*randNoise 
-            vObserv(sX,sY,tS) = vModel(sX,sY,tS) + 0.2*vModel(sX,sY,tS)*randNoise 
+            qObserv(sX,sY,tS) = qModel(sX,sY,tS) + percNoise*qModel(sX,sY,tS)*randNoise 
+            uObserv(sX,sY,tS) = uModel(sX,sY,tS) + percNoise*uModel(sX,sY,tS)*randNoise 
+            vObserv(sX,sY,tS) = vModel(sX,sY,tS) + percNoise*vModel(sX,sY,tS)*randNoise 
         enddo
     enddo
 enddo
@@ -563,7 +595,7 @@ counterFreqAssim = 0
 
 
 do tS = 1, timeStep
-    call model2d(dX, dY, dT, gridX, gridY, hFluidMean, qDampCoeff, uDampCoeff, vDampCoeff, coriolis, gravityConst)
+    call model2d(dX, dY, dT, gridX, gridY, hFluidMean, qDampCoeff, uDampCoeff, vDampCoeff, coriolis, gravityConst, qGl, uGl, vGl)
     qAnalysis(:,:,tS) = qGl
     uAnalysis(:,:,tS) = uGl
     vAnalysis(:,:,tS) = vGl
@@ -940,5 +972,13 @@ DEALLOCATE(vObservnorm)
 DEALLOCATE(qAnalysisnorm)
 DEALLOCATE(uAnalysisnorm)
 DEALLOCATE(vAnalysisnorm)
+
+DEALLOCATE(D)
+DEALLOCATE(qGl)
+DEALLOCATE(uGl)
+DEALLOCATE(vGl)
+DEALLOCATE(matrixGl)
+DEALLOCATE(matrixInvGl)
+
 
 END PROGRAM
