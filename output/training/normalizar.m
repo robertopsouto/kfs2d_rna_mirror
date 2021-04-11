@@ -21,7 +21,7 @@ qA_norm=(max(qA)*valNormInf-min(qA)*valNormSup+qA*(valNormSup-valNormInf))/(max(
 pontos_por_ciclo=25;
 ciclos=n/pontos_por_ciclo;
 
-parc1 = ceil(0.60*ciclos)*pontos_por_ciclo;
+parc1 = floor(0.60*ciclos)*pontos_por_ciclo;
 parc2 = ceil(0.10*ciclos)*pontos_por_ciclo;
 parc3 = n - parc1 - parc2;
 
