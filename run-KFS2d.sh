@@ -23,9 +23,9 @@ neuronNumber=${9}
 
 resultsdir=resultados/percNoise_$percNoise
 
-#if [[ ! -d $resultsdir ]]; then
+if [[ ! -d $resultsdir ]]; then
   mkdir -p $resultsdir
-#fi
+fi
 
 outputdir="output-gridX_$gridX-gridY_$gridY-timestep_$timeStep-freqObsT_$freqObsT-freqObsX_$freqObsX-freqObsY_$freqObsY"
 if [[ ${assimType} -eq 1 && -d ${resultsdir}/$outputdir ]]; then
