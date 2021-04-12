@@ -3,10 +3,10 @@
 # ./run-KFS2d.sh <assimType> <gridX> <gridY> <timeStep> <freqObsT> <freqObsX> <freqObsY> <percNoise> <neuronNumber>
 #
 #Uso com Filtro de Kalman: 
-# .run-KFS2d.sh 1 10 10 60 10 2 2 10
+# .run-KFS2d.sh 1 10 10 60 10 2 2 0.2 10
 #
 #Uso com RNA: 
-# .run-KFS2d.sh 2 10 10 60 10 2 2 10
+# .run-KFS2d.sh 2 10 10 60 10 2 2 0.2 10
 
 assimType=${1}
 gridX=${2}
@@ -23,9 +23,9 @@ neuronNumber=${9}
 
 resultsdir=resultados/percNoise_$percNoise
 
-if [[ ! -d $resultsdir ]]; then
-  mkdir $resultsdir
-fi
+#if [[ ! -d $resultsdir ]]; then
+  mkdir -p $resultsdir
+#fi
 
 outputdir="output-gridX_$gridX-gridY_$gridY-timestep_$timeStep-freqObsT_$freqObsT-freqObsX_$freqObsX-freqObsY_$freqObsY"
 if [[ ${assimType} -eq 1 && -d ${resultsdir}/$outputdir ]]; then
