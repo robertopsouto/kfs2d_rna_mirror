@@ -34,12 +34,13 @@ qpa10v = qpa10(:);
  qpr10v = qpr10(:);
 %
 figure(1)
-plot(qpm10v,'b','linewidth',2); hold on;
-plot(qpa10v,'r','linewidth',2);
-plot(qpr10v,'g','linewidth',2);
+plot(qpm10v,'b','linewidth',0.5); hold on;
+plot(qpa10v,'r','linewidth',0.5);
+plot(qpr10v,'g','linewidth',0.5);
 title('variavel q'); grid on;
 xlabel('tempo');
 ylabel('q(7,7)');
 legend('verdade','FK','RNA')
 axis([1 100 -60 80])
-print -depsc variavelqp77ExpA.eps
+%print -depsc variavelqExpA.eps;
+print -dpng -r240 variavelqExpA.png;
