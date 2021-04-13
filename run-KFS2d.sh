@@ -50,7 +50,7 @@ fi
 if [[ ${assimType} -eq 2 && -d ${resultsdir}/$outputdir ]]; then
   echo "Copiando o resultado da assimilacao de FK emulada por RNA."
   cp output/full/qAnalysisExpA_RNA.out ${resultsdir}/${outputdir}/full/qAnalysisExpA_RNA-neuronNumber_${neuronNumber}.out
-  if [[ -L ${resultsdir}/${outputdir}/full/qAnalysisExpA_RNA.out ]] then
+  if [[ -L ${resultsdir}/${outputdir}/full/qAnalysisExpA_RNA.out ]]; then
 	  rm ${resultsdir}/${outputdir}/full/qAnalysisExpA_RNA.out
   fi
   ln -s -r ${resultsdir}/${outputdir}/full/qAnalysisExpA_RNA-neuronNumber_${neuronNumber}.out ${resultsdir}/${outputdir}/full/qAnalysisExpA_RNA.out
