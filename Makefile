@@ -9,6 +9,7 @@ FFLAGSOPT = -O2
 
 #Bibliotecas
 FFLIBS = -llapack -lblas -g -fcheck=all -Wall -fbacktrace
+#FFLIBS = -I/scratch/cenapadrjsd/rpsouto/usr/local/spack/git/spack/opt/spack/linux-rhel7-ivybridge/gcc-8.3.0/openblas-0.3.13-mkwyvnyskpkkhdwiyrrnlsi2gypuw72z/include -L/scratch/cenapadrjsd/rpsouto/usr/local/spack/git/spack/opt/spack/linux-rhel7-ivybridge/gcc-8.3.0/openblas-0.3.13-mkwyvnyskpkkhdwiyrrnlsi2gypuw72z/lib -lopenblas -g -fcheck=all -Wall -fbacktrace
 
 #Objetos
 objects = kfsFunctions.o KFS2d.o
