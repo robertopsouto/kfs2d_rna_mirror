@@ -34,9 +34,9 @@ if [[ ${assimType} -eq 1 && -d ${resultsdir}/$outputdir ]]; then
 fi
 
 #Apaga os resultados anteriores
-rm output/*.out
-rm output/full/*.out
-rm output/training/*.out
+#rm output/*.out
+#rm output/full/*.out
+#rm output/training/*.out
 
 #Executa o KFS2d 
 ./KFS2d $assimType $gridX $gridY $timeStep $freqObsT $freqObsX $freqObsY $percNoise $neuronNumber 2>&1 | tee output.log 
