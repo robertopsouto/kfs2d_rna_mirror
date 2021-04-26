@@ -141,10 +141,10 @@ DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: yFcast
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: auxMatMul, auxMatMul2
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: xANNNorm, xANN, transpQGl
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:,:) :: yANN
-DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: wqco
-DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: bqcoAux, bqco
-DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: wqcs
-DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: bqcs
+DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: wqco, wuco, wvco
+DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: bqcoAux, bqco, buco, bvco
+DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: wqcs, wucs, wvcs
+DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: bqcs, bucs, bvcs
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: vco
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: vcs
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: yco
@@ -152,7 +152,9 @@ DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: ycs
 
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:) :: error
 
-DOUBLE PRECISION :: qModelMax, qModelMin
+DOUBLE PRECISION :: qObservMax, qObservMin
+DOUBLE PRECISION :: uObservMax, uObservMin
+DOUBLE PRECISION :: vObservMax, vObservMin
 
 character(len=7) :: fnametemp
 character(len=6) :: assimType_char, gridX_char, gridY_char, timeStep_char
@@ -163,7 +165,7 @@ CHARACTER(len=255) :: cmd
 CALL get_command(cmd)
 WRITE (*,*) TRIM(cmd)
 
-print*,"command_argument_count(): ",command_argument_count()
+!print*,"command_argument_count(): ",command_argument_count()
 
  call get_command_argument(1,assimType_char)
  call get_command_argument(2,gridX_char)
@@ -175,10 +177,16 @@ print*,"command_argument_count(): ",command_argument_count()
  call get_command_argument(8,percNoise_char)
  call get_command_argument(9,neuronNumber_char)
 
-print*, "freqObsX: ", freqObsX_char
-print*, "freqObsY: ", freqObsY_char
-print*, "percNoise: ", percNoise_char
+print* 
+print*, "gridX       : ", gridX_char
+print*, "gridY       : ", gridY_char
+print*, "timeStep    : ", timeStep_char
+print*, "freqObsT    : ", freqObsT_char
+print*, "freqObsX    : ", freqObsX_char
+print*, "freqObsY    : ", freqObsY_char
+print*, "percNoise   : ", percNoise_char
 print*, "neuronNumber: ", neuronNumber_char 
+print*
 
 assimType_char=trim(assimType_char)
 gridX_char=trim(gridX_char)
@@ -190,11 +198,6 @@ freqObsY_char=trim(freqObsY_char)
 percNoise_char=trim(percNoise_char)
 neuronNumber_char=trim(neuronNumber_char)
 
-
-! print*, "freqObsX: ", freqObsX_char
-! print*, "freqObsY: ", freqObsY_char
-! print*, "percNoise: ", percNoise_char
-! print*, "neuronNumber: ", neuronNumber_char
 
 fnametemp = 'temp.dat'
 write (fnametemp,*) assimType_char
@@ -333,9 +336,9 @@ ALLOCATE(auxMatMul(3*dKalmanMatrix,3*dKalmanMatrix))
 ALLOCATE(auxMatMul2(3*dKalmanMatrix,3*dKalmanMatrix))
 ALLOCATE(error(timeStep))
 
-ALLOCATE(yANN(1,gridX*gridY,timeStep))
-ALLOCATE(xANN(2, gridX*gridY))
-ALLOCATE(xANNNorm(2, gridX*gridY))
+ALLOCATE(yANN(3,gridX*gridY,timeStep))
+ALLOCATE(xANN(6,gridX*gridY))
+ALLOCATE(xANNNorm(6, gridX*gridY))
 ALLOCATE(transpQGl(gridX, gridY))
 
 ALLOCATE(wqco(neuronNumber,2))
@@ -343,6 +346,19 @@ ALLOCATE(bqcoAux(1,neuronNumber))
 ALLOCATE(bqco(neuronNumber,1))
 ALLOCATE(wqcs(1,neuronNumber))
 ALLOCATE(bqcs(1,1))
+
+ALLOCATE(wuco(neuronNumber,2))
+!ALLOCATE(bucoAux(1,neuronNumber))
+ALLOCATE(buco(neuronNumber,1))
+ALLOCATE(wucs(1,neuronNumber))
+ALLOCATE(bucs(1,1))
+
+ALLOCATE(wvco(neuronNumber,2))
+!ALLOCATE(bvcoAux(1,neuronNumber))
+ALLOCATE(bvco(neuronNumber,1))
+ALLOCATE(wvcs(1,neuronNumber))
+ALLOCATE(bvcs(1,1))
+
 ALLOCATE(vco(neuronNumber,1))
 ALLOCATE(vcs(1,1))
 ALLOCATE(yco(neuronNumber,1))
@@ -360,27 +376,6 @@ ALLOCATE(uAnalysisnorm(gridX,gridY,timeStep))
 ALLOCATE(vAnalysisnorm(gridX,gridY,timeStep))
 
 !**************************************************************************************
-if (assimType .eq. 2) then !Assimilacao com RNA
-	!Reading the weights files and bias for Neural Network
-	open(10, file = './data/wqcoExpA.dat')
-	do j = 1, 2
-    		read(10,*)(wqco(i,j),i = 1,neuronNumber)
-	enddo
-	close(10)
-
-	open(10, file = './data/bqcoExpA.dat')
-	    read(10,*)(bqco(i,1),i = 1, neuronNumber)
-	close(10)
-
-	open(10, file = './data/wqcsExpA.dat')
-	    read(10,*)(wqcs(1,j),j = 1,neuronNumber)
-	close(10)
-
-	open(10, file = './data/bqcsExpA.dat')
-	    read(10,*)bqcs(1,1)
-	close(10)
-endif
-
 
 !wqco = 0.5
 !bqco = 0.5
@@ -417,18 +412,18 @@ uInitialCond = uInitialCond + randNoise * D * (sqrt(2.0))
 vInitialCond = vInitialCond + randNoise * D * (sqrt(2.0))
 
 open(10, file = 'output/qInitialCondExpA.out')
-!open(11, file = 'output/uInitialCondExpA.out')
-!open(12, file = 'output/vInitialCondExpA.out')
+open(11, file = 'output/uInitialCondExpA.out')
+open(12, file = 'output/vInitialCondExpA.out')
 do sX = 1, gridX
     do sY = 1, gridY
         write(10,*)qInitialCond(sX, sY)
-        !write(11,*)uInitialCond(sX, sY)
-        !write(12,*)vInitialCond(sX, sY)
+        write(11,*)uInitialCond(sX, sY)
+        write(12,*)vInitialCond(sX, sY)
     enddo
 enddo
 close(10)
-!close(11)
-!close(12)
+close(11)
+close(12)
 print*,'SALVOU CONDICAO INICIAL - qInitialCondExpA.out'
 
 qGl = qInitialCond
@@ -446,20 +441,20 @@ enddo
 
 !Escrevendo dados em todo o dominio 2D, e todos os timesteps:
 open(10, file = 'output/full/qModelExpA.out')
-!open(11, file = 'output/full/uModelExpA.out')
-!open(12, file = 'output/full/vModelExpA.out')
+open(11, file = 'output/full/uModelExpA.out')
+open(12, file = 'output/full/vModelExpA.out')
 do tS = 1, timeStep
     do sX = 1, gridX
         do sY = 1, gridY
             write(10,'(6X,F10.6)',advance='no') qModel(sX, sY, tS)
-            !write(11,'(6X,F8.5)',advance='no') uModel(sX, sY, tS)
-            !write(12,'(6X,F8.5)',advance='no') vModel(sX, sY, tS)
+            write(11,'(6X,F10.6)',advance='no') uModel(sX, sY, tS)
+            write(12,'(6X,F10.6)',advance='no') vModel(sX, sY, tS)
         enddo
     enddo
 enddo
 close(10)
-!close(11)
-!close(12)
+close(11)
+close(12)
 
 print*,'SALVOU RESULTADO DA INTEGRACAO DO MODELO - qModelExpA.out'
 
@@ -485,14 +480,14 @@ print*,'Gerou o ruido que sera adicionado ao modelo - gerando as observacoes '
 
 !Escrevendo dados em todo o dominio 2D, e todos os timesteps:
 open(10, file = 'output/full/qObservExpA.out')
-!open(11, file = 'output/full/uObservExpA.out')
-!open(12, file = 'output/full/vObservExpA.out')
+open(11, file = 'output/full/uObservExpA.out')
+open(12, file = 'output/full/vObservExpA.out')
 do tS = 1, timeStep
     do sX = 1, gridX
         do sY = 1, gridY
             write(10,'(6X,F10.6)',advance='no') qObserv(sX, sY, tS)
-            !write(11,'(6X,F8.5)',advance='no') uObserv(sX, sY, tS)
-            !write(12,'(6X,F8.5)',advance='no') vObserv(sX, sY, tS)
+            write(11,'(6X,F10.6)',advance='no') uObserv(sX, sY, tS)
+            write(12,'(6X,F10.6)',advance='no') vObserv(sX, sY, tS)
         enddo
     enddo
 enddo
@@ -569,8 +564,13 @@ enddo
 
 pAnalysis = pCovariance             !Matriz de covariancia da analise
 
-qModelMax = maxval(qModel)
-qModelMin = minval(qModel)
+qObservMax = maxval(qObserv)
+qObservMin = minval(qObserv)
+uObservMax = maxval(uObserv)
+uObservMin = minval(uObserv)
+vObservMax = maxval(vObserv)
+vObservMin = minval(vObserv)
+
 !**************************************************************************************
 ! Processo de normalizacao dos dados para serem usados na RNA
 
@@ -593,11 +593,45 @@ endif
 !**************************************************************************************
 ! Inicializacao da variavel yANN para ser usada na RNA
 ! tirar o comentario da linha que se deseja avaliar
-yANN = qModelnorm
-!yANN = uModelnorm
-!yANN = vModelnorm
+!yANN(1,:,:) = qModelnorm
+!yANN(2,:,:) = uModelnorm
+!yANN(3,:,:) = vModelnorm
+
+yANN(1,:,:) = 0.0d+00
+yANN(2,:,:) = 0.0d+00
+yANN(3,:,:) = 0.0d+00
+
 
 counterFreqAssim = 0
+
+if (assimType .eq. 2) then !Assimilacao com RNA
+	!Reading the weights files and bias for Neural Network
+	open(10, file = './data/wqcoExpA.dat')
+	do j = 1, 2
+    		read(10,*)(wqco(i,j),i = 1,neuronNumber)
+	enddo
+	close(10)
+	open(10, file = './data/bqcoExpA.dat')
+	    read(10,*)(bqco(i,1),i = 1, neuronNumber)
+	close(10)
+	open(10, file = './data/wqcsExpA.dat')
+	    read(10,*)(wqcs(1,j),j = 1,neuronNumber)
+	close(10)
+	open(10, file = './data/bqcsExpA.dat')
+	    read(10,*)bqcs(1,1)
+	close(10)
+
+wuco=wqco
+wvco=wqco
+buco=bqco
+bvco=bqco
+wucs=wqcs
+wvcs=wqcs
+bucs=bqcs
+bvcs=bqcs
+
+endif
+
 
 
 do tS = 1, timeStep
@@ -764,43 +798,72 @@ do tS = 1, timeStep
         CASE (2)
 	    !**************************************************************************
             call CPU_TIME(initialAssimTime)
-	    print*, 'ANN Assimilation cycle - timeStep', tS
+            print*, 'ANN Assimilation cycle - timeStep', tS
             counterFreqAssim = 0
 
-	    counterCol = 1
+	        counterCol = 1
             do sX = 1, gridX
                 do sY = 1, gridY
                     xANN(1,counterCol) = qModelnorm(sX, sY,tS)
                     xANN(2,counterCol) = qObservnorm(sX,sY,tS)
-                    !xANN(1,counterCol) = uModelnorm(sX, sY,tS)
-                    !xANN(2,counterCol) = uObservnorm(sX,sY,tS)
-                    !xANN(1,counterCol) = vModelnorm(sX, sY,tS)
-                    !xANN(2,counterCol) = vObservnorm(sX,sY,tS)
+                    xANN(3,counterCol) = uModelnorm(sX, sY,tS)
+                    xANN(4,counterCol) = uObservnorm(sX,sY,tS)
+                    xANN(5,counterCol) = vModelnorm(sX, sY,tS)
+                    xANN(6,counterCol) = vObservnorm(sX,sY,tS)
                     counterCol = counterCol + 1
                 enddo
             enddo
 
 	        print*,'TUDO PRONTO PARA A RNA'
 
-            !do i = 1, gridX*gridY
             i=1
             do sX = 1, gridX
                 do sY = 1, gridY          
-                   vco(:,1) = matmul(wqco(:,:),xANN(:,i))
+                   vco(:,1) = matmul(wqco(:,:),xANN(1:2,i))
                    vco(:,1) = vco(:,1) - (bqco(:,1))
                    yco(:,1) = (1.d0 - DEXP(-vco(:,1))) / (1.d0 + DEXP(-vco(:,1)))
                    !!camada de saida
-                   vcs(:,1) = matmul(wqcs(:,:), yco(:,1))
-                   vcs(:,1) = vcs(:,1) - bqcs(:,1)
-                   yANN(:,i,tS) = (1.d0-DEXP(-vcs(:,1)))/(1.d0+DEXP(-vcs(:,1)))
-                   !qGl(sX,sY) = (yANN(:,i,tS)*(maxval(qModel)-minval(qModel)) + maxval(qModel) + minval(qModel))/2.0
-                   qGl(sX,sY) = (yANN(1,i,tS)*(qModelMax-qModelMin) + qModelMax + qModelMin)/2.0 
+                   vcs(1,1) = matmul(wqcs(1,:), yco(:,1))
+                   vcs(1,1) = vcs(1,1) - bqcs(1,1)
+                   yANN(1,i,tS) = (1.d0-DEXP(-vcs(1,1)))/(1.d0+DEXP(-vcs(1,1)))
+                   qGl(sX,sY) = (yANN(1,i,tS)*(qObservMax-qObservMin) + qObservMax + qObservMin)/2.0 
                    i = i + 1
                 enddo
             enddo
-
             qAnalysis(:,:,tS) = qGl
             
+            i=1
+            do sX = 1, gridX
+                do sY = 1, gridY          
+                   vco(:,1) = matmul(wuco(:,:),xANN(3:4,i))
+                   vco(:,1) = vco(:,1) - (buco(:,1))
+                   yco(:,1) = (1.d0 - DEXP(-vco(:,1))) / (1.d0 + DEXP(-vco(:,1)))
+                   !!camada de saida
+                   vcs(:,1) = matmul(wucs(:,:), yco(:,1))
+                   vcs(:,1) = vcs(:,1) - bucs(:,1)
+                   yANN(2,i,tS) = (1.d0-DEXP(-vcs(:,1)))/(1.d0+DEXP(-vcs(:,1)))
+                   uGl(sX,sY) = (yANN(2,i,tS)*(uObservMax-uObservMin) + uObservMax + uObservMin)/2.0 
+                   i = i + 1
+                enddo
+            enddo
+            uAnalysis(:,:,tS) = qGl
+
+            i=1
+            do sX = 1, gridX
+                do sY = 1, gridY          
+                   vco(:,1) = matmul(wvco(:,:),xANN(5:6,i))
+                   vco(:,1) = vco(:,1) - (bvco(:,1))
+                   yco(:,1) = (1.d0 - DEXP(-vco(:,1))) / (1.d0 + DEXP(-vco(:,1)))
+                   !!camada de saida
+                   vcs(:,1) = matmul(wvcs(:,:), yco(:,1))
+                   vcs(:,1) = vcs(:,1) - bvcs(:,1)
+                   yANN(3,i,tS) = (1.d0-DEXP(-vcs(:,1)))/(1.d0+DEXP(-vcs(:,1)))
+                   vGl(sX,sY) = (yANN(3,i,tS)*(vObservMax-vObservMin) + vObservMax + vObservMin)/2.0 
+                   i = i + 1
+                enddo
+            enddo
+            vAnalysis(:,:,tS) = qGl
+
             
             print*,'PASSAMOS PELA RNA'
 
@@ -841,78 +904,78 @@ endif
 if (assimType .eq. 1) then 
 !Escrevendo dados em todo o dominio 2D, e todos os timesteps:
 open(10, file = 'output/full/qAnalysisExpA.out')
-!open(11, file = 'output/full/uAnalysisExpA.out')
-!open(12, file = 'output/full/vAnalysisExpA.out')
+open(11, file = 'output/full/uAnalysisExpA.out')
+open(12, file = 'output/full/vAnalysisExpA.out')
 do tS = 1, timeStep
     do sX = 1, gridX
         do sY = 1, gridY
-            write(10,'(6X,F10.6)',advance='no') qAnalysis(sX, sY, tS)
-	    !write(11,'(6X,F8.5)',advance='no') uAnalysis(sX, sY, tS)
-	    !write(12,'(6X,F8.5)',advance='no') vAnalysis(sX, sY, tS)
+           write(10,'(6X,F10.6)',advance='no') qAnalysis(sX, sY, tS)
+	       write(11,'(6X,F10.6)',advance='no') uAnalysis(sX, sY, tS)
+	       write(12,'(6X,F10.6)',advance='no') vAnalysis(sX, sY, tS)
         enddo
     enddo
 enddo
 close(10)
-!close(11)
-!close(12)
+close(11)
+close(12)
 
 
 !qAnalysisnorm = (maxval(qAnalysis) * valNormInf - minval(qAnalysis) * valNormSup + qAnalysis * &
 !	&(valNormSup - valNormInf)) / (maxval(qAnalysis) - minval(qAnalysis))
 !Escrevendo dados a serem utilizados no MPCA
 open(10, file = 'output/training/qAnalysisExpA.out')
-!open(11, file = 'output/training/uAnalysisExpA.out')
-!open(12, file = 'output/training/vAnalysisExpA.out')
+open(11, file = 'output/training/uAnalysisExpA.out')
+open(12, file = 'output/training/vAnalysisExpA.out')
 do tS = freqObsT, timeStep, freqObsT
     do sX = freqObsX, gridX, freqObsX
         do sY = freqObsY, gridY, freqObsY
-            write(10,'(6X,F10.6)',advance='no') qAnalysis(sX, sY, tS)
-	    !write(11,'(6X,F8.5)',advance='no') uAnalysis(sX, sY, tS)
-	    !write(12,'(6X,F8.5)',advance='no') vAnalysis(sX, sY, tS)
+           write(10,'(6X,F10.6)',advance='no') qAnalysis(sX, sY, tS)
+           write(11,'(6X,F10.6)',advance='no') uAnalysis(sX, sY, tS)
+           write(12,'(6X,F10.6)',advance='no') vAnalysis(sX, sY, tS)
         enddo
     enddo
 enddo
 close(10)
-!close(11)
-!close(12)
+close(11)
+close(12)
 
 !qObservnorm = (maxval(qObserv) * valNormInf - minval(qObserv) * valNormSup + qObserv * &
 !	&(valNormSup - valNormInf)) / (maxval(qObserv) - minval(qObserv))
 !Escrevendo dados a serem utilizados no MPCA
 open(10, file = 'output/training/qObservExpA.out')
-!open(11, file = 'output/training/uObservExpA.out')
-!open(12, file = 'output/training/vObservExpA.out')
+open(11, file = 'output/training/uObservExpA.out')
+open(12, file = 'output/training/vObservExpA.out')
 do tS = freqObsT, timeStep, freqObsT
     do sX = freqObsX, gridX, freqObsX
         do sY = freqObsY, gridY, freqObsY
-            write(10,'(6X,F10.6)',advance='no') qObserv(sX, sY, tS)
-            !write(11,'(6X,F8.5)',advance='no') uObserv(sX, sY, tS)
-            !write(12,'(6X,F8.5)',advance='no') vObserv(sX, sY, tS)
+           write(10,'(6X,F10.6)',advance='no') qObserv(sX, sY, tS)
+           write(11,'(6X,F10.6)',advance='no') uObserv(sX, sY, tS)
+           write(12,'(6X,F10.6)',advance='no') vObserv(sX, sY, tS)
         enddo
     enddo
 enddo
 close(10)
-!close(11)
-!close(12)
+close(11)
+close(12)
 
 !qModelnorm = (maxval(qModel) * valNormInf - minval(qModel) * valNormSup + qModel * &
 !	&(valNormSup - valNormInf)) / (maxval(qModel) - minval(qModel))
 !Escrevendo dados a serem utilizados no MPCA
 open(10, file = 'output/training/qModelExpA.out')
-!open(11, file = 'output/training/uModelExpA.out')
-!open(12, file = 'output/training/vModelExpA.out')
+open(11, file = 'output/training/uModelExpA.out')
+open(12, file = 'output/training/vModelExpA.out')
 do tS = freqObsT, timeStep, freqObsT
     do sX = freqObsX, gridX, freqObsX
         do sY = freqObsY, gridY, freqObsY
             write(10,'(6X,F10.6)',advance='no') qModel(sX, sY, tS)
-            !write(11,'(6X,F8.5)',advance='no') uModel(sX, sY, tS)
-            !write(12,'(6X,F8.5)',advance='no') vModel(sX, sY, tS)
+            write(11,'(6X,F10.6)',advance='no') uModel(sX, sY, tS)
+            write(12,'(6X,F10.6)',advance='no') vModel(sX, sY, tS)
         enddo
     enddo
 enddo
 close(10)
-!close(11)
-!close(12)
+close(11)
+close(12)
 
 endif
 
@@ -956,11 +1019,25 @@ DEALLOCATE(kK)
 DEALLOCATE(Q)
 DEALLOCATE(identityMatrix)
 DEALLOCATE(error)
+
 DEALLOCATE(wqco)
 DEALLOCATE(bqcoAux)
 DEALLOCATE(bqco)
 DEALLOCATE(wqcs)
 DEALLOCATE(bqcs)
+
+DEALLOCATE(wuco)
+!DEALLOCATE(bucoAux)
+DEALLOCATE(buco)
+DEALLOCATE(wucs)
+DEALLOCATE(bucs)
+
+DEALLOCATE(wvco)
+!DEALLOCATE(bvcoAux)
+DEALLOCATE(bvco)
+DEALLOCATE(wvcs)
+DEALLOCATE(bvcs)
+
 DEALLOCATE(vco)
 DEALLOCATE(vcs)
 DEALLOCATE(yco)
