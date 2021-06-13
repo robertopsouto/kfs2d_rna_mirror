@@ -145,9 +145,9 @@ DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: wqco
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: bqcoAux, bqco
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: wqcs
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: bqcs
-DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: vco
+DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:,:) :: vco
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: vcs
-DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: yco
+DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:,:) :: yco
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: ycs
 
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:) :: error
@@ -343,10 +343,10 @@ ALLOCATE(bqcoAux(1,neuronNumber))
 ALLOCATE(bqco(neuronNumber,1))
 ALLOCATE(wqcs(1,neuronNumber))
 ALLOCATE(bqcs(1,1))
-ALLOCATE(vco(neuronNumber,1))
-ALLOCATE(vcs(1,1))
-ALLOCATE(yco(neuronNumber,1))
-ALLOCATE(ycs(1,1))
+ALLOCATE(vco(neuronNumber,1,numThreads))
+ALLOCATE(vcs(1,1,numThreads))
+ALLOCATE(yco(neuronNumber,1,numThreads))
+ALLOCATE(ycs(1,1,numThreads))
 
 !Normalization
 ALLOCATE(qObservnorm(gridX,gridY,timeStep))
@@ -782,21 +782,23 @@ do tS = 1, timeStep
 
 	        print*,'TUDO PRONTO PARA A RNA'
 
-            !do i = 1, gridX*gridY
-            i=1
-            do sX = 1, gridX
-                do sY = 1, gridY          
-                   vco(:,1) = matmul(wqco(:,:),xANN(:,i))
-                   vco(:,1) = vco(:,1) - (bqco(:,1))
-                   yco(:,1) = (1.d0 - DEXP(-vco(:,1))) / (1.d0 + DEXP(-vco(:,1)))
+            do i = 1, gridX*gridY
+            !i=1+ompThread
+            !do sX = 1, gridX
+                !do sY = 1, gridY          
+                   vco(:,1,ompThread) = matmul(wqco(:,:),xANN(:,i))
+                   vco(:,1,ompThread) = vco(:,1,ompThread) - (bqco(:,1))
+                   yco(:,1,ompThread) = (1.d0 - DEXP(-vco(:,1,ompThread))) / (1.d0 + DEXP(-vco(:,1,ompThread)))
                    !!camada de saida
-                   vcs(:,1) = matmul(wqcs(:,:), yco(:,1))
-                   vcs(:,1) = vcs(:,1) - bqcs(:,1)
-                   yANN(:,i,tS) = (1.d0-DEXP(-vcs(:,1)))/(1.d0+DEXP(-vcs(:,1)))
+                   vcs(:,1,ompThread) = matmul(wqcs(:,:), yco(:,1,ompThread))
+                   vcs(:,1,ompThread) = vcs(:,1,ompThread) - bqcs(:,1)
+                   yANN(:,i,tS) = (1.d0-DEXP(-vcs(:,1,ompThread)))/(1.d0+DEXP(-vcs(:,1,ompThread)))
                    !qGl(sX,sY) = (yANN(:,i,tS)*(maxval(qModel)-minval(qModel)) + maxval(qModel) + minval(qModel))/2.0
+                   sX=
                    qGl(sX,sY) = (yANN(1,i,tS)*(qModelMax-qModelMin) + qModelMax + qModelMin)/2.0 
-                   i = i + 1
-                enddo
+                   !i = i + numThreads
+                !enddo
+            !enddo
             enddo
 
             qAnalysis(:,:,tS) = qGl
