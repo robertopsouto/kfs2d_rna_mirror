@@ -68,6 +68,8 @@ USE KfsFunctions
 !****************************************************************************************
 IMPLICIT NONE
 
+INTEGER :: numThreads, tid, omp_get_num_threads, omp_get_thread_num
+
 INTEGER :: i, j, k, s   !Laces index
 INTEGER :: sX, sY, tS   !Index: step X, step Y, time Step
 INTEGER :: dT
@@ -146,9 +148,9 @@ DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: bqcoAux, bqco
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: wqcs
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: bqcs
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:,:) :: vco
-DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: vcs
+DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:,:) :: vcs
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:,:) :: yco
-DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: ycs
+DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:,:) :: ycs
 
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:) :: error
 
@@ -343,6 +345,15 @@ ALLOCATE(bqcoAux(1,neuronNumber))
 ALLOCATE(bqco(neuronNumber,1))
 ALLOCATE(wqcs(1,neuronNumber))
 ALLOCATE(bqcs(1,1))
+
+!$OMP PARALLEL
+numThreads = omp_get_num_threads()
+!$OMP END PARALLEL
+
+print*
+print*, "numThreads: ", numThreads
+print*
+
 ALLOCATE(vco(neuronNumber,1,numThreads))
 ALLOCATE(vcs(1,1,numThreads))
 ALLOCATE(yco(neuronNumber,1,numThreads))
@@ -782,24 +793,28 @@ do tS = 1, timeStep
 
 	        print*,'TUDO PRONTO PARA A RNA'
 
-            do i = 1, gridX*gridY
-            !i=1+ompThread
-            !do sX = 1, gridX
-                !do sY = 1, gridY          
-                   vco(:,1,ompThread) = matmul(wqco(:,:),xANN(:,i))
-                   vco(:,1,ompThread) = vco(:,1,ompThread) - (bqco(:,1))
-                   yco(:,1,ompThread) = (1.d0 - DEXP(-vco(:,1,ompThread))) / (1.d0 + DEXP(-vco(:,1,ompThread)))
+!$OMP PARALLEL           &
+!$OMP DEFAULT(shared)    &
+!$OMP PRIVATE(sX,i)     
+            do sY = 1, gridY
+!$OMP DO
+                do sX = 1, gridX
+                   tid = omp_get_thread_num()
+                   i = (sY-1)*gridX + sX
+                   vco(:,1,tid) = matmul(wqco(:,:),xANN(:,i))
+                   vco(:,1,tid) = vco(:,1,tid) - (bqco(:,1))
+                   yco(:,1,tid) = (1.d0 - DEXP(-vco(:,1,tid))) / (1.d0 + DEXP(-vco(:,1,tid)))
                    !!camada de saida
-                   vcs(:,1,ompThread) = matmul(wqcs(:,:), yco(:,1,ompThread))
-                   vcs(:,1,ompThread) = vcs(:,1,ompThread) - bqcs(:,1)
-                   yANN(:,i,tS) = (1.d0-DEXP(-vcs(:,1,ompThread)))/(1.d0+DEXP(-vcs(:,1,ompThread)))
+                   vcs(:,1,tid) = matmul(wqcs(:,:), yco(:,1,tid))
+                   vcs(:,1,tid) = vcs(:,1,tid) - bqcs(:,1)
+                   yANN(:,i,tS) = (1.d0-DEXP(-vcs(:,1,tid)))/(1.d0+DEXP(-vcs(:,1,tid)))
                    !qGl(sX,sY) = (yANN(:,i,tS)*(maxval(qModel)-minval(qModel)) + maxval(qModel) + minval(qModel))/2.0
-                   sX=
                    qGl(sX,sY) = (yANN(1,i,tS)*(qModelMax-qModelMin) + qModelMax + qModelMin)/2.0 
-                   !i = i + numThreads
-                !enddo
-            !enddo
-            enddo
+                enddo
+!$OMP END DO                
+            enddo            
+!$OMP END PARALLEL
+
 
             qAnalysis(:,:,tS) = qGl
             
