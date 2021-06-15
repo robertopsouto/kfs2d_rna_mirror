@@ -95,7 +95,7 @@ REAL*8  :: rhoAir
 REAL*8  :: zonalW
 REAL*8  :: rhoWatter
 REAL*8  :: uExtForce, vExtForce
-REAL*8  :: randNoise
+REAL*8  :: randNoise, rand
 REAL*8  :: initialAssimTime, endAssimTime, totalAssimTime
 REAL*8  :: initialProcessTime, endProcessTime, totalProcessTime
 REAL*8  :: a
@@ -348,6 +348,7 @@ ALLOCATE(bqcs(1,1))
 
 !$OMP PARALLEL
 numThreads = omp_get_num_threads()
+print*, "omp_get_thread_num(): ", omp_get_thread_num()
 !$OMP END PARALLEL
 
 print*
@@ -476,10 +477,13 @@ print*,'SALVOU RESULTADO DA INTEGRACAO DO MODELO - qModelExpA.out'
 
 
 call srand(0)
+!call random_seed(0)
 do sY = 1, gridY
     do sX = 1, gridX
         do tS = 1, timeStep
             randNoise = 2*rand()-1
+            !call random_number(randNoise)
+            !randNoise = 2*randNoise-1           
             !randNoiseObserv(sX,sY,tS) = randNoise * sqrt(0.01)
             qObserv(sX,sY,tS) = qModel(sX,sY,tS) + percNoise*qModel(sX,sY,tS)*randNoise 
             uObserv(sX,sY,tS) = uModel(sX,sY,tS) + percNoise*uModel(sX,sY,tS)*randNoise 
@@ -535,6 +539,7 @@ do tS = freqObsT, timeStep, freqObsT
     enddo
 enddo
 
+!if (assimType .eq. 1) then 
 !**************************************************************************************
 ! Kalman Filter Assimilation
 freqAssim = freqObsT
@@ -579,6 +584,8 @@ do sY = 1, 3*dKalmanMatrix
 enddo
 
 pAnalysis = pCovariance             !Matriz de covariancia da analise
+
+!endif
 
 qModelMax = maxval(qModel)
 qModelMin = minval(qModel)
@@ -793,14 +800,16 @@ do tS = 1, timeStep
 
 	        print*,'TUDO PRONTO PARA A RNA'
 
-!$OMP PARALLEL           &
+! $OMP PARALLEL           &
+! $OMP DEFAULT(shared)    &
+! $OMP PRIVATE(sX,i)     
+            do sX = 1, gridX
+!$OMP PARALLEL DO         &
 !$OMP DEFAULT(shared)    &
 !$OMP PRIVATE(sX,i)     
-            do sY = 1, gridY
-!$OMP DO
-                do sX = 1, gridX
-                   tid = omp_get_thread_num()
-                   i = (sY-1)*gridX + sX
+                do sY = 1, gridY
+                   tid = omp_get_thread_num()+1
+                   i = (sX-1)*gridY + sY
                    vco(:,1,tid) = matmul(wqco(:,:),xANN(:,i))
                    vco(:,1,tid) = vco(:,1,tid) - (bqco(:,1))
                    yco(:,1,tid) = (1.d0 - DEXP(-vco(:,1,tid))) / (1.d0 + DEXP(-vco(:,1,tid)))
@@ -811,9 +820,9 @@ do tS = 1, timeStep
                    !qGl(sX,sY) = (yANN(:,i,tS)*(maxval(qModel)-minval(qModel)) + maxval(qModel) + minval(qModel))/2.0
                    qGl(sX,sY) = (yANN(1,i,tS)*(qModelMax-qModelMin) + qModelMax + qModelMin)/2.0 
                 enddo
-!$OMP END DO                
+!$OMP END PARALLEL DO                
             enddo            
-!$OMP END PARALLEL
+! $OMP END PARALLEL
 
 
             qAnalysis(:,:,tS) = qGl
@@ -1003,5 +1012,8 @@ DEALLOCATE(vGl)
 DEALLOCATE(matrixGl)
 DEALLOCATE(matrixInvGl)
 
+DEALLOCATE(auxMatMul)
+DEALLOCATE(auxMatMul2)
+DEALLOCATE(transpQGl)
 
 END PROGRAM
