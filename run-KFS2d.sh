@@ -17,9 +17,12 @@ freqObsX=${6}
 freqObsY=${7} 
 percNoise=${8} 
 neuronNumber=${9}
+numthreads=${10}
 
 #DATE=$(date +%Y-%m-%d-%H%M%S)
 #starttime=starttime_${DATE}
+
+export OMP_NUM_THREADS=${numthreads}
 
 resultsdir=resultados/percNoise_$percNoise
 
