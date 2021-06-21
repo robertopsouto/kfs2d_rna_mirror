@@ -15,6 +15,8 @@ Versão Serial (src/KFS2d.f90: atual no branch ***master***)
 i=1
 do sX = 1, gridX
    do sY = 1, gridY
+      xANN(1,i) = qModelnorm(sX,sY,tS)
+      xANN(2,i) = qObservnorm(sX,sY,tS)
       vco(:,1) = matmul(wqco(:,:),xANN(:,i))
       vco(:,1) = vco(:,1) - (bqco(:,1))
       yco(:,1) = (1.d0 - DEXP(-vco(:,1))) / (1.d0 + DEXP(-vco(:,1)))
@@ -31,12 +33,14 @@ Versão OpenMP  (src/KFS2d.f90: em desenvolvimento neste branch ***master_openmp
 
 ```fortran
 do sX = 1, gridX
-!$OMP PARALLEL DO        &
-!$OMP DEFAULT(shared)    &
-!$OMP PRIVATE(sX,i)     
+!$OMP PARALLEL DO         &
+!$OMP DEFAULT(shared)     &
+!$OMP PRIVATE(sY,i,tid)     
    do sY = 1, gridY
-      tid = omp_get_thread_num()+1
+      tid = omp_get_thread_num() + 1
       i = (sX-1)*gridY + sY
+      xANN(1,i) = qModelnorm(sX,sY,tS)
+      xANN(2,i) = qObservnorm(sX,sY,tS)
       vco(:,1,tid) = matmul(wqco(:,:),xANN(:,i))
       vco(:,1,tid) = vco(:,1,tid) - (bqco(:,1))
       yco(:,1,tid) = (1.d0 - DEXP(-vco(:,1,tid))) / (1.d0 + DEXP(-vco(:,1,tid)))
@@ -47,5 +51,5 @@ do sX = 1, gridX
    enddo
 !$OMP END PARALLEL DO                
 enddo            
-
+  
 ```
