@@ -69,6 +69,7 @@ USE KfsFunctions
 IMPLICIT NONE
 
 INTEGER :: numThreads, tid, omp_get_num_threads, omp_get_thread_num
+DOUBLE PRECISION :: omp_get_wtime
 
 INTEGER :: i, j, k, s   !Laces index
 INTEGER :: sX, sY, tS   !Index: step X, step Y, time Step
@@ -177,6 +178,8 @@ print*,"command_argument_count(): ",command_argument_count()
  call get_command_argument(8,percNoise_char)
  call get_command_argument(9,neuronNumber_char)
 
+print*, "gridX: ", gridX_char
+print*, "gridY: ", gridY_char
 print*, "freqObsX: ", freqObsX_char
 print*, "freqObsY: ", freqObsY_char
 print*, "percNoise: ", percNoise_char
@@ -192,11 +195,6 @@ freqObsY_char=trim(freqObsY_char)
 percNoise_char=trim(percNoise_char)
 neuronNumber_char=trim(neuronNumber_char)
 
-
-! print*, "freqObsX: ", freqObsX_char
-! print*, "freqObsY: ", freqObsY_char
-! print*, "percNoise: ", percNoise_char
-! print*, "neuronNumber: ", neuronNumber_char
 
 fnametemp = 'temp.dat'
 write (fnametemp,*) assimType_char
@@ -218,13 +216,19 @@ read (fnametemp,*) percNoise
 write (fnametemp,*) neuronNumber_char
 read (fnametemp,*) neuronNumber
 
+print*, "gridX: ", gridX
+print*, "gridY: ", gridY
+
 
 ALLOCATE(D(gridX,gridY))
 ALLOCATE(qGl(gridX,gridY))
 ALLOCATE(uGl(gridX,gridY))
 ALLOCATE(vGl(gridX,gridY))
-ALLOCATE(matrixGl(3*gridX*gridY,3*gridX*gridY))
-ALLOCATE(matrixInvGl(3*gridX*gridY,3*gridX*gridY))
+
+if (assimType .eq. 1) then 
+   ALLOCATE(matrixGl(3*gridX*gridY,3*gridX*gridY))
+   ALLOCATE(matrixInvGl(3*gridX*gridY,3*gridX*gridY))
+endif
 
 ! Initialization of variables/parameters
 dX = 100.0d3
@@ -318,21 +322,25 @@ ALLOCATE(qAnalysis(gridX,gridY,timeStep))
 ALLOCATE(uAnalysis(gridX,gridY,timeStep))
 ALLOCATE(vAnalysis(gridX,gridY,timeStep))
 ALLOCATE(randNoiseObserv(gridX,gridY,timeStep))
-ALLOCATE(vectorObserv(3*dKalmanMatrix,timeStep))
+
 ALLOCATE(vectorModel(3*dKalmanMatrix,1))
-ALLOCATE(xAnalysis(3*dKalmanMatrix,1))
-ALLOCATE(yFcast(3*dKalmanMatrix,1))
-ALLOCATE(fFcast(3*dKalmanMatrix,3*dKalmanMatrix))
-ALLOCATE(pCovariance(3*dKalmanMatrix,3*dKalmanMatrix))
-ALLOCATE(pAnalysis(3*dKalmanMatrix,3*dKalmanMatrix))
-ALLOCATE(H(3*dKalmanMatrix,3*dKalmanMatrix))
-ALLOCATE(R(3*dKalmanMatrix,3*dKalmanMatrix))
-ALLOCATE(pFcast(3*dKalmanMatrix,3*dKalmanMatrix))
-ALLOCATE(kK(3*dKalmanMatrix,3*dKalmanMatrix))
-ALLOCATE(Q(3*dKalmanMatrix,3*dKalmanMatrix))
-ALLOCATE(identityMatrix(3*dKalmanMatrix,3*dKalmanMatrix))
-ALLOCATE(auxMatMul(3*dKalmanMatrix,3*dKalmanMatrix))
-ALLOCATE(auxMatMul2(3*dKalmanMatrix,3*dKalmanMatrix))
+if (assimType .eq. 1) then 
+   ALLOCATE(vectorObserv(3*dKalmanMatrix,timeStep))
+   !ALLOCATE(vectorModel(3*dKalmanMatrix,1))
+   ALLOCATE(xAnalysis(3*dKalmanMatrix,1))
+   ALLOCATE(yFcast(3*dKalmanMatrix,1))
+   ALLOCATE(fFcast(3*dKalmanMatrix,3*dKalmanMatrix))
+   ALLOCATE(pCovariance(3*dKalmanMatrix,3*dKalmanMatrix))
+   ALLOCATE(pAnalysis(3*dKalmanMatrix,3*dKalmanMatrix))
+   ALLOCATE(H(3*dKalmanMatrix,3*dKalmanMatrix))
+   ALLOCATE(R(3*dKalmanMatrix,3*dKalmanMatrix))
+   ALLOCATE(pFcast(3*dKalmanMatrix,3*dKalmanMatrix))
+   ALLOCATE(kK(3*dKalmanMatrix,3*dKalmanMatrix))
+   ALLOCATE(Q(3*dKalmanMatrix,3*dKalmanMatrix))
+   ALLOCATE(identityMatrix(3*dKalmanMatrix,3*dKalmanMatrix))
+   ALLOCATE(auxMatMul(3*dKalmanMatrix,3*dKalmanMatrix))
+   ALLOCATE(auxMatMul2(3*dKalmanMatrix,3*dKalmanMatrix))
+endif
 ALLOCATE(error(timeStep))
 
 ALLOCATE(yANN(1,gridX*gridY,timeStep))
@@ -428,6 +436,8 @@ qInitialCond = qInitialCond + randNoise * D * (sqrt(2.0))
 uInitialCond = uInitialCond + randNoise * D * (sqrt(2.0))
 vInitialCond = vInitialCond + randNoise * D * (sqrt(2.0))
 
+
+if (assimType .eq. 3) then
 open(10, file = 'output/qInitialCondExpA.out')
 !open(11, file = 'output/uInitialCondExpA.out')
 !open(12, file = 'output/vInitialCondExpA.out')
@@ -442,6 +452,7 @@ close(10)
 !close(11)
 !close(12)
 print*,'SALVOU CONDICAO INICIAL - qInitialCondExpA.out'
+endif
 
 qGl = qInitialCond
 uGl = uInitialCond
@@ -456,6 +467,7 @@ do tS = 1, timeStep
     vModel(:,:,tS) = vGl
 enddo
 
+if (assimType .eq. 3) then
 !Escrevendo dados em todo o dominio 2D, e todos os timesteps:
 open(10, file = 'output/full/qModelExpA.out')
 !open(11, file = 'output/full/uModelExpA.out')
@@ -472,9 +484,8 @@ enddo
 close(10)
 !close(11)
 !close(12)
-
 print*,'SALVOU RESULTADO DA INTEGRACAO DO MODELO - qModelExpA.out'
-
+endif
 
 call srand(0)
 do sY = 1, gridY
@@ -495,6 +506,7 @@ print*,'Gerou o ruido que sera adicionado ao modelo - gerando as observacoes '
 !uObserv = uModel + randNoiseObserv
 !vObserv = vModel + randNoiseObserv
 
+if (assimType .eq. 3) then
 !Escrevendo dados em todo o dominio 2D, e todos os timesteps:
 open(10, file = 'output/full/qObservExpA.out')
 !open(11, file = 'output/full/uObservExpA.out')
@@ -511,13 +523,14 @@ enddo
 close(10)
 !close(11)
 !close(12)
-
 print*,'SALVOU AS OBSERVACOES -- MODELO + Rand - qObservExpA.out'
+endif
 
 qGl = qInitialCond
 uGl = uInitialCond
 vGl = vInitialCond
 
+if (assimType .eq. 1) then
 !**************************************************************************************
 ! Generating observation vector - y
 do tS = freqObsT, timeStep, freqObsT
@@ -535,11 +548,13 @@ do tS = freqObsT, timeStep, freqObsT
         s = s + gridY
     enddo
 enddo
+endif
+
+freqAssim = freqObsT
 
 if (assimType .eq. 1) then 
 !**************************************************************************************
 ! Kalman Filter Assimilation
-freqAssim = freqObsT
 print*, 'Inicializou a freqAssim'
 auxMatMul   = 0.0
 print*, 'Inicializando as matrizes 1'
@@ -612,8 +627,8 @@ yANN = qModelnorm
 !yANN = uModelnorm
 !yANN = vModelnorm
 
-counterFreqAssim = 0
-
+ counterFreqAssim = 0
+ totalAssimTime = 0.0d+00
 
 do tS = 1, timeStep
     call model2d(dX, dY, dT, gridX, gridY, hFluidMean, qDampCoeff, uDampCoeff, vDampCoeff, coriolis, gravityConst, qGl, uGl, vGl)
@@ -777,29 +792,11 @@ do tS = 1, timeStep
             write(40,*) 'FK Assimilation time: ', totalAssimTime, tS
 
         CASE (2)
-	    !**************************************************************************
-            call CPU_TIME(initialAssimTime)
-	    print*, 'ANN Assimilation cycle - timeStep', tS
+  	        !**************************************************************************
+            print*, 'ANN Assimilation cycle - timeStep', tS
             counterFreqAssim = 0
 
-	    counterCol = 1
-            do sX = 1, gridX
-                do sY = 1, gridY
-                    xANN(1,counterCol) = qModelnorm(sX, sY,tS)
-                    xANN(2,counterCol) = qObservnorm(sX,sY,tS)
-                    !xANN(1,counterCol) = uModelnorm(sX, sY,tS)
-                    !xANN(2,counterCol) = uObservnorm(sX,sY,tS)
-                    !xANN(1,counterCol) = vModelnorm(sX, sY,tS)
-                    !xANN(2,counterCol) = vObservnorm(sX,sY,tS)
-                    counterCol = counterCol + 1
-                enddo
-            enddo
-
-	        print*,'TUDO PRONTO PARA A RNA'
-
-! $OMP PARALLEL           &
-! $OMP DEFAULT(shared)    &
-! $OMP PRIVATE(sX,i)     
+            initialAssimTime = omp_get_wtime()
             do sX = 1, gridX
 !$OMP PARALLEL DO         &
 !$OMP DEFAULT(shared)     &
@@ -807,40 +804,33 @@ do tS = 1, timeStep
                 do sY = 1, gridY
                    tid = omp_get_thread_num() + 1
                    i = (sX-1)*gridY + sY
+                   xANN(1,i) = qModelnorm(sX, sY,tS)
+                   xANN(2,i) = qObservnorm(sX,sY,tS)
                    vco(:,1,tid) = matmul(wqco(:,:),xANN(:,i))
                    vco(:,1,tid) = vco(:,1,tid) - (bqco(:,1))
                    yco(:,1,tid) = (1.d0 - DEXP(-vco(:,1,tid))) / (1.d0 + DEXP(-vco(:,1,tid)))
-                   !!camada de saida
                    vcs(:,1,tid) = matmul(wqcs(:,:), yco(:,1,tid))
                    vcs(:,1,tid) = vcs(:,1,tid) - bqcs(:,1)
                    yANN(:,i,tS) = (1.d0-DEXP(-vcs(:,1,tid)))/(1.d0+DEXP(-vcs(:,1,tid)))
-                   !qGl(sX,sY) = (yANN(:,i,tS)*(maxval(qModel)-minval(qModel)) + maxval(qModel) + minval(qModel))/2.0
                    qGl(sX,sY) = (yANN(1,i,tS)*(qModelMax-qModelMin) + qModelMax + qModelMin)/2.0 
                 enddo
 !$OMP END PARALLEL DO                
             enddo            
-! $OMP END PARALLEL
-
+            endAssimTime = omp_get_wtime()
+            totalAssimTime = totalAssimTime + (endAssimTime - initialAssimTime)
 
             qAnalysis(:,:,tS) = qGl
-            
-            
-            print*,'PASSAMOS PELA RNA'
-
-            call CPU_TIME(endAssimTime)
-            totalAssimTime = endAssimTime - initialAssimTime
-            print*,'ANN Assimilation time: ', totalAssimTime, tS
-            write(40,*)'ANN Assimilation time: ', totalAssimTime, tS
-
-        CASE(3)
-          print*,'Chamar FPGA'
-
         END SELECT
-
     endif
 enddo
 
-if (assimType .eq. 2) then !Processo de desnormalizacao da saida de RNA
+if (assimType .eq. 2) then
+   print*,'ANN Assimilation time: ', totalAssimTime
+   write(40,*)'ANN Assimilation time: ', totalAssimTime
+endif
+
+
+if (assimType .eq. 3) then !Processo de desnormalizacao da saida de RNA
 !	qAnalysis = (yANN * (maxval(qModel) - minval(qModel)) - maxval(qModel) * valNormInf +&
 !			& minval(qModel) * valNormSup) / (valNormSup - valNormInf)
 !Escrevendo dados em todo o dominio 2D, e todos os timesteps:
@@ -861,7 +851,7 @@ close(10)
 !close(12)		
 endif
 
-if (assimType .eq. 1) then 
+if (assimType .eq. 3) then 
 !Escrevendo dados em todo o dominio 2D, e todos os timesteps:
 open(10, file = 'output/full/qAnalysisExpA.out')
 !open(11, file = 'output/full/uAnalysisExpA.out')
@@ -949,68 +939,69 @@ close(40)
 print*,'FIM'
 
 ! Initial condition data
-DEALLOCATE(qInitialCond)
-DEALLOCATE(uInitialCond)
-DEALLOCATE(vInitialCond)
+if (allocated(qInitialCond)) DEALLOCATE(qInitialCond)
+if (allocated(uInitialCond)) DEALLOCATE(uInitialCond)
+if (allocated(vInitialCond)) DEALLOCATE(vInitialCond)
 ! Observation data
-DEALLOCATE(qObserv)
-DEALLOCATE(uObserv)
-DEALLOCATE(vObserv)
+if (allocated(qObserv)) DEALLOCATE(qObserv)
+if (allocated(uObserv)) DEALLOCATE(uObserv)
+if (allocated(vObserv)) DEALLOCATE(vObserv)
 ! Model/Prediction data
-DEALLOCATE(qModel)
-DEALLOCATE(uModel)
-DEALLOCATE(vModel)
+if (allocated(qModel)) DEALLOCATE(qModel)
+if (allocated(uModel)) DEALLOCATE(uModel)
+if (allocated(vModel)) DEALLOCATE(vModel)
 ! Analysis/Kalman Filter data
-DEALLOCATE(qAnalysis)
-DEALLOCATE(uAnalysis)
-DEALLOCATE(vAnalysis)
-DEALLOCATE(randNoiseObserv)
-DEALLOCATE(vectorObserv)
-DEALLOCATE(vectorModel)
-DEALLOCATE(xAnalysis)
-DEALLOCATE(yFcast)
-DEALLOCATE(fFcast)
-DEALLOCATE(pCovariance)
-DEALLOCATE(pAnalysis)
-DEALLOCATE(H)
-DEALLOCATE(R)
-DEALLOCATE(pFcast)
-DEALLOCATE(kK)
-DEALLOCATE(Q)
-DEALLOCATE(identityMatrix)
-DEALLOCATE(error)
-DEALLOCATE(wqco)
-DEALLOCATE(bqcoAux)
-DEALLOCATE(bqco)
-DEALLOCATE(wqcs)
-DEALLOCATE(bqcs)
-DEALLOCATE(vco)
-DEALLOCATE(vcs)
-DEALLOCATE(yco)
-DEALLOCATE(ycs)
-DEALLOCATE(yANN)
-DEALLOCATE(xANN)
-DEALLOCATE(xANNNorm)
+if (allocated(qAnalysis)) DEALLOCATE(qAnalysis)
+if (allocated(uAnalysis)) DEALLOCATE(uAnalysis)
+if (allocated(vAnalysis)) DEALLOCATE(vAnalysis)
 
-DEALLOCATE(qModelnorm)
-DEALLOCATE(uModelnorm)
-DEALLOCATE(vModelnorm)
-DEALLOCATE(qObservnorm)
-DEALLOCATE(uObservnorm)
-DEALLOCATE(vObservnorm)
-DEALLOCATE(qAnalysisnorm)
-DEALLOCATE(uAnalysisnorm)
-DEALLOCATE(vAnalysisnorm)
+if (allocated(randNoiseObserv)) DEALLOCATE(randNoiseObserv)
+if (allocated(vectorObserv)) DEALLOCATE(vectorObserv)
+if (allocated(vectorModel)) DEALLOCATE(vectorModel)
+if (allocated(xAnalysis)) DEALLOCATE(xAnalysis)
+if (allocated(yFcast)) DEALLOCATE(yFcast)
+if (allocated(fFcast)) DEALLOCATE(fFcast)
+if (allocated(pCovariance)) DEALLOCATE(pCovariance)
+if (allocated(pAnalysis)) DEALLOCATE(pAnalysis)
+if (allocated(H)) DEALLOCATE(H)
+if (allocated(R)) DEALLOCATE(R)
+if (allocated(pFcast)) DEALLOCATE(pFcast)
+if (allocated(kK)) DEALLOCATE(kK)
+if (allocated(Q)) DEALLOCATE(Q)
+if (allocated(identityMatrix)) DEALLOCATE(identityMatrix)
+if (allocated(error)) DEALLOCATE(error)
+if (allocated(wqco)) DEALLOCATE(wqco)
+if (allocated(bqcoAux)) DEALLOCATE(bqcoAux)
+if (allocated(bqco)) DEALLOCATE(bqco)
+if (allocated(wqcs)) DEALLOCATE(wqcs)
+if (allocated(bqcs)) DEALLOCATE(bqcs)
+if (allocated(vco)) DEALLOCATE(vco)
+if (allocated(vcs)) DEALLOCATE(vcs)
+if (allocated(yco)) DEALLOCATE(yco)
+if (allocated(ycs)) DEALLOCATE(ycs)
+if (allocated(yANN)) DEALLOCATE(yANN)
+if (allocated(xANN)) DEALLOCATE(xANN)
+if (allocated(xANNNorm)) DEALLOCATE(xANNNorm)
 
-DEALLOCATE(D)
-DEALLOCATE(qGl)
-DEALLOCATE(uGl)
-DEALLOCATE(vGl)
-DEALLOCATE(matrixGl)
-DEALLOCATE(matrixInvGl)
+if (allocated(qModelnorm)) DEALLOCATE(qModelnorm)
+if (allocated(uModelnorm)) DEALLOCATE(uModelnorm)
+if (allocated(vModelnorm)) DEALLOCATE(vModelnorm)
+if (allocated(qObservnorm)) DEALLOCATE(qObservnorm)
+if (allocated(uObservnorm)) DEALLOCATE(uObservnorm)
+if (allocated(vObservnorm)) DEALLOCATE(vObservnorm)
+if (allocated(qAnalysisnorm)) DEALLOCATE(qAnalysisnorm)
+if (allocated(uAnalysisnorm)) DEALLOCATE(uAnalysisnorm)
+if (allocated(vAnalysisnorm)) DEALLOCATE(vAnalysisnorm)
 
-DEALLOCATE(auxMatMul)
-DEALLOCATE(auxMatMul2)
-DEALLOCATE(transpQGl)
+if (allocated(D)) DEALLOCATE(D)
+if (allocated(qGl)) DEALLOCATE(qGl)
+if (allocated(uGl)) DEALLOCATE(uGl)
+if (allocated(vGl)) DEALLOCATE(vGl)
+if (allocated(matrixGl)) DEALLOCATE(matrixGl)
+if (allocated(matrixInvGl)) DEALLOCATE(matrixInvGl)
+
+if (allocated(auxMatMul)) DEALLOCATE(auxMatMul)
+if (allocated(auxMatMul2)) DEALLOCATE(auxMatMul2)
+if (allocated(transpQGl)) DEALLOCATE(transpQGl)
 
 END PROGRAM
