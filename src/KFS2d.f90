@@ -287,7 +287,8 @@ vGl = 0.0
 
 !**************************************************************************************
 ! Storing the time spent
-call CPU_TIME(initialProcessTime)
+initialProcessTime = omp_get_wtime()
+
 if (assimType .eq. 1) then !Assimilacao com FK
    open(40, file='output/computingFKTime.out')
 endif
@@ -628,8 +629,8 @@ yANN = qModelnorm
 !yANN = vModelnorm
 
  counterFreqAssim = 0
- totalAssimTime = 0.0d+00
-
+ 
+if (assimType .eq. 1) then 
 do tS = 1, timeStep
     call model2d(dX, dY, dT, gridX, gridY, hFluidMean, qDampCoeff, uDampCoeff, vDampCoeff, coriolis, gravityConst, qGl, uGl, vGl)
     qAnalysis(:,:,tS) = qGl
@@ -653,8 +654,6 @@ do tS = 1, timeStep
     counterFreqAssim = counterFreqAssim + 1
 
     if (counterFreqAssim .EQ. freqAssim)  then
-        SELECT CASE (assimType)
-        CASE (1)
 	    !**************************************************************************
             call CPU_TIME(initialAssimTime)
             print*, 'FK Assimilation cycle - timeStep', tS
@@ -785,13 +784,24 @@ do tS = 1, timeStep
             uAnalysis(:,:,tS) = uGl
             vAnalysis(:,:,tS) = vGl
 
-
             call CPU_TIME(endAssimTime)
             totalAssimTime = endAssimTime - initialAssimTime
-            print*,'FK Assimilation time: ', totalAssimTime, tS
-            write(40,*) 'FK Assimilation time: ', totalAssimTime, tS
+        endif
+   enddo
+   print*,'FK Assimilation time: ', totalAssimTime, tS
+   write(40,*) 'FK Assimilation time: ', totalAssimTime, tS
+endif
 
-        CASE (2)
+if (assimType .eq. 2) then
+   counterFreqAssim = 0
+   totalAssimTime = 0.0d+00
+   do tS = 1, timeStep
+      call model2d(dX, dY, dT, gridX, gridY, hFluidMean, qDampCoeff, uDampCoeff, vDampCoeff, coriolis, gravityConst, qGl, uGl, vGl)
+      qAnalysis(:,:,tS) = qGl
+
+      counterFreqAssim = counterFreqAssim + 1
+
+      if (counterFreqAssim .eq. freqAssim)  then
   	        !**************************************************************************
             print*, 'ANN Assimilation cycle - timeStep', tS
             counterFreqAssim = 0
@@ -800,11 +810,11 @@ do tS = 1, timeStep
             do sX = 1, gridX
 !$OMP PARALLEL DO         &
 !$OMP DEFAULT(shared)     &
-!$OMP PRIVATE(sY,i)     
+!$OMP PRIVATE(sY,i,tid)     
                 do sY = 1, gridY
                    tid = omp_get_thread_num() + 1
                    i = (sX-1)*gridY + sY
-                   xANN(1,i) = qModelnorm(sX, sY,tS)
+                   xANN(1,i) = qModelnorm(sX,sY,tS)
                    xANN(2,i) = qObservnorm(sX,sY,tS)
                    vco(:,1,tid) = matmul(wqco(:,:),xANN(:,i))
                    vco(:,1,tid) = vco(:,1,tid) - (bqco(:,1))
@@ -820,17 +830,14 @@ do tS = 1, timeStep
             totalAssimTime = totalAssimTime + (endAssimTime - initialAssimTime)
 
             qAnalysis(:,:,tS) = qGl
-        END SELECT
-    endif
-enddo
-
-if (assimType .eq. 2) then
+        endif
+   enddo
    print*,'ANN Assimilation time: ', totalAssimTime
-   write(40,*)'ANN Assimilation time: ', totalAssimTime
+   write(40,*)'ANN Assimilation time: ', totalAssimTime   
 endif
 
 
-if (assimType .eq. 3) then !Processo de desnormalizacao da saida de RNA
+if (assimType .eq. 2) then !Processo de desnormalizacao da saida de RNA
 !	qAnalysis = (yANN * (maxval(qModel) - minval(qModel)) - maxval(qModel) * valNormInf +&
 !			& minval(qModel) * valNormSup) / (valNormSup - valNormInf)
 !Escrevendo dados em todo o dominio 2D, e todos os timesteps:
@@ -929,7 +936,8 @@ close(10)
 
 endif
 
-call CPU_TIME(endProcessTime)
+endProcessTime = omp_get_wtime()
+
 totalProcessTime = endProcessTime - initialProcessTime
 print*,'Total Process time: ', totalProcessTime
 
