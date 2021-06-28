@@ -807,10 +807,10 @@ if (assimType .eq. 2) then
             counterFreqAssim = 0
 
             initialAssimTime = omp_get_wtime()
-            do sX = 1, gridX
 !$OMP PARALLEL DO         &
 !$OMP DEFAULT(shared)     &
-!$OMP PRIVATE(sY,i,tid)     
+!$OMP PRIVATE(sX,sY,i,tid)                 
+            do sX = 1, gridX
                 do sY = 1, gridY
                    tid = omp_get_thread_num() + 1
                    i = (sX-1)*gridY + sY
@@ -824,8 +824,8 @@ if (assimType .eq. 2) then
                    yANN(:,i,tS) = (1.d0-DEXP(-vcs(:,1,tid)))/(1.d0+DEXP(-vcs(:,1,tid)))
                    qGl(sX,sY) = (yANN(1,i,tS)*(qModelMax-qModelMin) + qModelMax + qModelMin)/2.0 
                 enddo
-!$OMP END PARALLEL DO                
-            enddo            
+            enddo
+!$OMP END PARALLEL DO
             endAssimTime = omp_get_wtime()
             totalAssimTime = totalAssimTime + (endAssimTime - initialAssimTime)
 
