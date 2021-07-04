@@ -98,6 +98,7 @@ REAL*8  :: rhoWatter
 REAL*8  :: uExtForce, vExtForce
 REAL*8  :: randNoise, rand
 REAL*8  :: initialAssimTime, endAssimTime, totalAssimTime
+REAL*8  :: initialModelTime, endModelTime, totalModelTime
 REAL*8  :: initialProcessTime, endProcessTime, totalProcessTime
 REAL*8  :: a
 REAL*8  :: valNormInf, valNormSup
@@ -795,8 +796,13 @@ endif
 if (assimType .eq. 2) then
    counterFreqAssim = 0
    totalAssimTime = 0.0d+00
+   totalModelTime = 0.0d+00
    do tS = 1, timeStep
+      initialModelTime = omp_get_wtime()
       call model2d(dX, dY, dT, gridX, gridY, hFluidMean, qDampCoeff, uDampCoeff, vDampCoeff, coriolis, gravityConst, qGl, uGl, vGl)
+      endModelTime = omp_get_wtime()
+      totalModelTime = totalModelTime + (endModelTime - initialModelTime)
+
       qAnalysis(:,:,tS) = qGl
 
       counterFreqAssim = counterFreqAssim + 1
@@ -834,10 +840,12 @@ if (assimType .eq. 2) then
    enddo
    print*,'ANN Assimilation time: ', totalAssimTime
    write(40,*)'ANN Assimilation time: ', totalAssimTime   
+   print*,'Total Model time: ', totalModelTime
+   write(40,*)'Total Model time: ', totalModelTime   
 endif
 
 
-if (assimType .eq. 2) then !Processo de desnormalizacao da saida de RNA
+if (assimType .eq. 3) then !Processo de desnormalizacao da saida de RNA
 !	qAnalysis = (yANN * (maxval(qModel) - minval(qModel)) - maxval(qModel) * valNormInf +&
 !			& minval(qModel) * valNormSup) / (valNormSup - valNormInf)
 !Escrevendo dados em todo o dominio 2D, e todos os timesteps:
