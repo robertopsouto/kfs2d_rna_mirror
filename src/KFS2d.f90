@@ -837,7 +837,7 @@ if (assimType .eq. 2) then
 endif
 
 
-if (assimType .eq. 3) then !Processo de desnormalizacao da saida de RNA
+if (assimType .eq. 2) then !Processo de desnormalizacao da saida de RNA
 !	qAnalysis = (yANN * (maxval(qModel) - minval(qModel)) - maxval(qModel) * valNormInf +&
 !			& minval(qModel) * valNormSup) / (valNormSup - valNormInf)
 !Escrevendo dados em todo o dominio 2D, e todos os timesteps:

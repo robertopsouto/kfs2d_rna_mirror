@@ -98,77 +98,118 @@ CONTAINS
         dqdx=0.0
         dqdy=0.0
 
+!$OMP PARALLEL            &
+!$OMP DEFAULT(shared)     &
+!$OMP PRIVATE(i,j)        
+        
         !Calculo dos divergentes na direcao x
+!$OMP DO
         do i = 1, ni - 1 
             do j = 1, nj - 1 
                 divx(i,j)  = cx * (uGl(i+1, j) - uGl(i, j))
             enddo
         enddo
+!$OMP END DO
+
+!$OMP DO
         do j = 1, nj - 1
             divx(ni,j) = cx * (uGl(1,j) - uGl(ni,j))
         enddo
+!$OMP END DO 
 
         !Calculo dos divergentes na direcao y
+!$OMP DO        
         do i = 1, ni !i = linha
             do j = 1, nj - 1 !j = coluna
                 divy(i, j)  = cy * (vGl(i, j+1) - vGl(i, j))
             enddo
         enddo
+!$OMP END DO
+
+!$OMP DO        
         do j = 1, nj - 1 !j = coluna
             divx(ni, j) = cx * (uGl(1, j) - uGl(ni, j))
         enddo
+!$OMP END DO
 
+!$OMP DO
         do i = 1, ni !i = linha
             do j = 1, nj-1 !j = coluna
                 qGl(i,j) = qGl(i,j) + real(dt) *(-(real(Hmean)) * (divx(i,j) + divy(i,j)) - (rq * qGl(i,j)))
             enddo
         enddo
+!$OMP END DO
 
+!$OMP DO
         do i = 2, ni !i = linha
             do j = 1, nj-1 ! j = coluna
                 dqdx(i,j) = cx * (qGl(i,j) - qGl(i-1,j))
             enddo
         enddo
+!$OMP END DO
+
+!$OMP DO        
         do j = 1, nj-1 ! j = coluna
             dqdx(1,j) = cx * (qGl(1,j) - qGl(ni,j))
         enddo
+!$OMP END DO
 
+!$OMP DO
         do i = 1, ni !i = linha
             do j = 2, nj-1 !j = coluna
                 dqdy(i,j)= cy * (qGl(i,j) - qGl(i,j-1))
             enddo
         enddo
+!$OMP END DO
 
+!$OMP DO
         do i = 1, ni-1 !i = linha
             do j = 2, nj-1!j = coluna
                 ubar(i,j) = 0.25 * (uGl(i+1,j) + uGl(i,j) + uGl(i+1,j-1) + uGl(i,j-1))
             enddo
         enddo
+!$OMP END DO
+
+!$OMP DO        
         do j = 2, nj-1!j = coluna
             ubar(ni,j) = 0.25 * (uGl(1,j) + uGl(ni,j) + uGl(1,j-1) + uGl(ni,j-1))
         enddo
+!$OMP END DO
 
+!$OMP DO
         do i = 2, ni !j = coluna
             do j = 1, nj-1 !i = linha
                 vbar(i,j) = 0.25 * (vGl(i,j+1) + vGl(i,j) + vGl(i-1,j+1) + vGl(i-1,j))
             enddo
         enddo
+!$OMP END DO
+
+!$OMP DO        
         do j = 1, nj-1 !i = linha
             vbar(1,j) = 0.25 * (vGl(1,j+1) + vGl(1,j) + vGl(ni,j+1) + vGl(ni,j))
         enddo
+!$OMP END DO
+
+!$OMP DO        
         !Atualizando u
         do i  = 1, ni !i = linha
             do j = 1, nj-1 !j = coluna
                 uGl(i,j) = uGl(i,j) + real(dt) *(f * vbar(i,j) - g * dqdx(i,j) - ru * uGl(i,j) + Fu)
             enddo
         enddo
+!$OMP END DO
 
         !Atualiza v
+!$OMP DO        
         do i = 1, ni !i = linha    
             do j = 2, nj-1 !j= coluna
                 vGl(i,j) = vGl(i,j) + real(dt) * (-f * ubar(i,j) - g * dqdy(i,j) - rv * vGl(i,j) + Fv)
             enddo
         enddo
+!$OMP END DO
+
+
+!$OMP END PARALLEL
 
         deallocate(divx)
         deallocate(divy)
