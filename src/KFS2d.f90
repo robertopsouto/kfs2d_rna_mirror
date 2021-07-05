@@ -469,7 +469,7 @@ initialTime = omp_get_wtime()
 !Integrando o modelo no tempo
 do tS = 1, timeStep
     call model2d(dX, dY, dT, gridX, gridY, hFluidMean, qDampCoeff, uDampCoeff, vDampCoeff, coriolis, gravityConst, qGl, uGl, vGl)
-    initialPartTime = omp_get_wtime()
+    !initialPartTime = omp_get_wtime()
     do sY = 1, gridY
         do sX = 1, gridX
            qModel(sX,sY,tS) = qGl(sX,sY)
@@ -477,12 +477,12 @@ do tS = 1, timeStep
            vModel(sX,sY,tS) = vGl(sX,sY)
         enddo
     enddo
-    endPartTime = omp_get_wtime()
-    accumPartTime = accumPartTime + (endPartTime-initialPartTime)
+    !endPartTime = omp_get_wtime()
+    !accumPartTime = accumPartTime + (endPartTime-initialPartTime)
 enddo
 endTime = omp_get_wtime()
 print*,'Tempo de integracao do modelo  : ', endTime-initialTime
-print*,'Tempo de atualizacao dos campos: ', accumPartTime
+!print*,'Tempo de atualizacao dos campos: ', accumPartTime
 
 if (assimType .eq. 3) then
 !Escrevendo dados em todo o dominio 2D, e todos os timesteps:
@@ -504,19 +504,21 @@ close(10)
 print*,'SALVOU RESULTADO DA INTEGRACAO DO MODELO - qModelExpA.out'
 endif
 
+initialTime = omp_get_wtime()
 call srand(0)
-do sY = 1, gridY
-    do sX = 1, gridX
-        do tS = 1, timeStep
-            randNoise = 2*rand()-1
-            !randNoiseObserv(sX,sY,tS) = randNoise * sqrt(0.01)
-            qObserv(sX,sY,tS) = qModel(sX,sY,tS) + percNoise*qModel(sX,sY,tS)*randNoise 
-            uObserv(sX,sY,tS) = uModel(sX,sY,tS) + percNoise*uModel(sX,sY,tS)*randNoise 
-            vObserv(sX,sY,tS) = vModel(sX,sY,tS) + percNoise*vModel(sX,sY,tS)*randNoise 
-        enddo
-    enddo
+do tS = 1, timeStep
+   do sY = 1, gridY
+      do sX = 1, gridX
+         randNoise = 2*rand()-1
+         !randNoiseObserv(sX,sY,tS) = randNoise * sqrt(0.01)
+         qObserv(sX,sY,tS) = qModel(sX,sY,tS) + percNoise*qModel(sX,sY,tS)*randNoise 
+         uObserv(sX,sY,tS) = uModel(sX,sY,tS) + percNoise*uModel(sX,sY,tS)*randNoise 
+         vObserv(sX,sY,tS) = vModel(sX,sY,tS) + percNoise*vModel(sX,sY,tS)*randNoise 
+      enddo
+   enddo
 enddo
-
+endTime = omp_get_wtime()
+print*,'Tempo de insercao do ruido  : ', endTime-initialTime
 print*,'Gerou o ruido que sera adicionado ao modelo - gerando as observacoes '
 
 !qObserv = qModel + randNoiseObserv
@@ -818,7 +820,11 @@ if (assimType .eq. 2) then
       endModelTime = omp_get_wtime()
       totalModelTime = totalModelTime + (endModelTime - initialModelTime)
 
-      qAnalysis(:,:,tS) = qGl
+      do sY = 1, gridY
+         do sX = 1, gridX
+            qAnalysis(sX,sY,tS) = qGl(sX,sY)
+         enddo
+      enddo
 
       counterFreqAssim = counterFreqAssim + 1
 
