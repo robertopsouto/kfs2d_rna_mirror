@@ -97,6 +97,8 @@ REAL*8  :: zonalW
 REAL*8  :: rhoWatter
 REAL*8  :: uExtForce, vExtForce
 REAL*8  :: randNoise, rand
+REAL*8  :: initialTime, endTime
+REAL*8  :: initialPartTime, endPartTime, accumPartTime
 REAL*8  :: initialAssimTime, endAssimTime, totalAssimTime
 REAL*8  :: initialProcessTime, endProcessTime, totalProcessTime
 REAL*8  :: a
@@ -459,14 +461,27 @@ qGl = qInitialCond
 uGl = uInitialCond
 vGl = vInitialCond
 
+accumPartTime = 0.0d+00
+
+initialTime = omp_get_wtime()
 !**************************************************************************************
 !Integrando o modelo no tempo
 do tS = 1, timeStep
     call model2d(dX, dY, dT, gridX, gridY, hFluidMean, qDampCoeff, uDampCoeff, vDampCoeff, coriolis, gravityConst, qGl, uGl, vGl)
-    qModel(:,:,tS) = qGl
-    uModel(:,:,tS) = uGl
-    vModel(:,:,tS) = vGl
+    initialPartTime = omp_get_wtime()
+    do sY = 1, gridY
+        do sX = 1, gridX
+           qModel(sX,sY,tS) = qGl(sX,sY)
+           uModel(sX,sY,tS) = uGl(sX,sY)
+           vModel(sX,sY,tS) = vGl(sX,sY)
+        enddo
+    enddo
+    endPartTime = omp_get_wtime()
+    accumPartTime = accumPartTime + (endPartTime-initialPartTime)
 enddo
+endTime = omp_get_wtime()
+print*,'Tempo de integracao do modelo  : ', endTime-initialTime
+print*,'Tempo de atualizacao dos campos: ', accumPartTime
 
 if (assimType .eq. 3) then
 !Escrevendo dados em todo o dominio 2D, e todos os timesteps:
