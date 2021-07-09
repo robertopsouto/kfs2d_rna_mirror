@@ -221,8 +221,10 @@ ALLOCATE(D(gridX,gridY))
 ALLOCATE(qGl(gridX,gridY))
 ALLOCATE(uGl(gridX,gridY))
 ALLOCATE(vGl(gridX,gridY))
-ALLOCATE(matrixGl(3*gridX*gridY,3*gridX*gridY))
-ALLOCATE(matrixInvGl(3*gridX*gridY,3*gridX*gridY))
+if (assimType .eq. 1) then 
+   ALLOCATE(matrixGl(3*gridX*gridY,3*gridX*gridY))
+   ALLOCATE(matrixInvGl(3*gridX*gridY,3*gridX*gridY))
+endif
 
 ! Initialization of variables/parameters
 dX = 100.0d3
@@ -317,21 +319,24 @@ ALLOCATE(qAnalysis(gridX,gridY,timeStep))
 ALLOCATE(uAnalysis(gridX,gridY,timeStep))
 ALLOCATE(vAnalysis(gridX,gridY,timeStep))
 ALLOCATE(randNoiseObserv(gridX,gridY,timeStep))
-ALLOCATE(vectorObserv(3*dKalmanMatrix,timeStep))
 ALLOCATE(vectorModel(3*dKalmanMatrix,1))
-ALLOCATE(xAnalysis(3*dKalmanMatrix,1))
-ALLOCATE(yFcast(3*dKalmanMatrix,1))
-ALLOCATE(fFcast(3*dKalmanMatrix,3*dKalmanMatrix))
-ALLOCATE(pCovariance(3*dKalmanMatrix,3*dKalmanMatrix))
-ALLOCATE(pAnalysis(3*dKalmanMatrix,3*dKalmanMatrix))
-ALLOCATE(H(3*dKalmanMatrix,3*dKalmanMatrix))
-ALLOCATE(R(3*dKalmanMatrix,3*dKalmanMatrix))
-ALLOCATE(pFcast(3*dKalmanMatrix,3*dKalmanMatrix))
-ALLOCATE(kK(3*dKalmanMatrix,3*dKalmanMatrix))
-ALLOCATE(Q(3*dKalmanMatrix,3*dKalmanMatrix))
-ALLOCATE(identityMatrix(3*dKalmanMatrix,3*dKalmanMatrix))
-ALLOCATE(auxMatMul(3*dKalmanMatrix,3*dKalmanMatrix))
-ALLOCATE(auxMatMul2(3*dKalmanMatrix,3*dKalmanMatrix))
+if (assimType .eq. 1) then 
+   ALLOCATE(vectorObserv(3*dKalmanMatrix,timeStep))
+   !ALLOCATE(vectorModel(3*dKalmanMatrix,1))
+   ALLOCATE(xAnalysis(3*dKalmanMatrix,1))
+   ALLOCATE(yFcast(3*dKalmanMatrix,1))
+   ALLOCATE(fFcast(3*dKalmanMatrix,3*dKalmanMatrix))
+   ALLOCATE(pCovariance(3*dKalmanMatrix,3*dKalmanMatrix))
+   ALLOCATE(pAnalysis(3*dKalmanMatrix,3*dKalmanMatrix))
+   ALLOCATE(H(3*dKalmanMatrix,3*dKalmanMatrix))
+   ALLOCATE(R(3*dKalmanMatrix,3*dKalmanMatrix))
+   ALLOCATE(pFcast(3*dKalmanMatrix,3*dKalmanMatrix))
+   ALLOCATE(kK(3*dKalmanMatrix,3*dKalmanMatrix))
+   ALLOCATE(Q(3*dKalmanMatrix,3*dKalmanMatrix))
+   ALLOCATE(identityMatrix(3*dKalmanMatrix,3*dKalmanMatrix))
+   ALLOCATE(auxMatMul(3*dKalmanMatrix,3*dKalmanMatrix))
+   ALLOCATE(auxMatMul2(3*dKalmanMatrix,3*dKalmanMatrix))
+endif
 ALLOCATE(error(timeStep))
 
 ALLOCATE(yANN(1,gridX*gridY,timeStep))
@@ -517,6 +522,7 @@ qGl = qInitialCond
 uGl = uInitialCond
 vGl = vInitialCond
 
+if (assimType .eq. 1) then 
 !**************************************************************************************
 ! Generating observation vector - y
 do tS = freqObsT, timeStep, freqObsT
@@ -537,7 +543,6 @@ enddo
 
 !**************************************************************************************
 ! Kalman Filter Assimilation
-freqAssim = freqObsT
 print*, 'Inicializou a freqAssim'
 auxMatMul   = 0.0
 print*, 'Inicializando as matrizes 1'
@@ -579,6 +584,9 @@ do sY = 1, 3*dKalmanMatrix
 enddo
 
 pAnalysis = pCovariance             !Matriz de covariancia da analise
+endif
+
+freqAssim = freqObsT
 
 qModelMax = maxval(qModel)
 qModelMin = minval(qModel)
@@ -941,65 +949,69 @@ close(40)
 print*,'FIM'
 
 ! Initial condition data
-DEALLOCATE(qInitialCond)
-DEALLOCATE(uInitialCond)
-DEALLOCATE(vInitialCond)
+if (allocated(qInitialCond)) DEALLOCATE(qInitialCond)
+if (allocated(uInitialCond)) DEALLOCATE(uInitialCond)
+if (allocated(vInitialCond)) DEALLOCATE(vInitialCond)
 ! Observation data
-DEALLOCATE(qObserv)
-DEALLOCATE(uObserv)
-DEALLOCATE(vObserv)
+if (allocated(qObserv)) DEALLOCATE(qObserv)
+if (allocated(uObserv)) DEALLOCATE(uObserv)
+if (allocated(vObserv)) DEALLOCATE(vObserv)
 ! Model/Prediction data
-DEALLOCATE(qModel)
-DEALLOCATE(uModel)
-DEALLOCATE(vModel)
+if (allocated(qModel)) DEALLOCATE(qModel)
+if (allocated(uModel)) DEALLOCATE(uModel)
+if (allocated(vModel)) DEALLOCATE(vModel)
 ! Analysis/Kalman Filter data
-DEALLOCATE(qAnalysis)
-DEALLOCATE(uAnalysis)
-DEALLOCATE(vAnalysis)
-DEALLOCATE(randNoiseObserv)
-DEALLOCATE(vectorObserv)
-DEALLOCATE(vectorModel)
-DEALLOCATE(xAnalysis)
-DEALLOCATE(yFcast)
-DEALLOCATE(fFcast)
-DEALLOCATE(pCovariance)
-DEALLOCATE(pAnalysis)
-DEALLOCATE(H)
-DEALLOCATE(R)
-DEALLOCATE(pFcast)
-DEALLOCATE(kK)
-DEALLOCATE(Q)
-DEALLOCATE(identityMatrix)
-DEALLOCATE(error)
-DEALLOCATE(wqco)
-DEALLOCATE(bqcoAux)
-DEALLOCATE(bqco)
-DEALLOCATE(wqcs)
-DEALLOCATE(bqcs)
-DEALLOCATE(vco)
-DEALLOCATE(vcs)
-DEALLOCATE(yco)
-DEALLOCATE(ycs)
-DEALLOCATE(yANN)
-DEALLOCATE(xANN)
-DEALLOCATE(xANNNorm)
+if (allocated(qAnalysis)) DEALLOCATE(qAnalysis)
+if (allocated(uAnalysis)) DEALLOCATE(uAnalysis)
+if (allocated(vAnalysis)) DEALLOCATE(vAnalysis)
 
-DEALLOCATE(qModelnorm)
-DEALLOCATE(uModelnorm)
-DEALLOCATE(vModelnorm)
-DEALLOCATE(qObservnorm)
-DEALLOCATE(uObservnorm)
-DEALLOCATE(vObservnorm)
-DEALLOCATE(qAnalysisnorm)
-DEALLOCATE(uAnalysisnorm)
-DEALLOCATE(vAnalysisnorm)
+if (allocated(randNoiseObserv)) DEALLOCATE(randNoiseObserv)
+if (allocated(vectorObserv)) DEALLOCATE(vectorObserv)
+if (allocated(vectorModel)) DEALLOCATE(vectorModel)
+if (allocated(xAnalysis)) DEALLOCATE(xAnalysis)
+if (allocated(yFcast)) DEALLOCATE(yFcast)
+if (allocated(fFcast)) DEALLOCATE(fFcast)
+if (allocated(pCovariance)) DEALLOCATE(pCovariance)
+if (allocated(pAnalysis)) DEALLOCATE(pAnalysis)
+if (allocated(H)) DEALLOCATE(H)
+if (allocated(R)) DEALLOCATE(R)
+if (allocated(pFcast)) DEALLOCATE(pFcast)
+if (allocated(kK)) DEALLOCATE(kK)
+if (allocated(Q)) DEALLOCATE(Q)
+if (allocated(identityMatrix)) DEALLOCATE(identityMatrix)
+if (allocated(error)) DEALLOCATE(error)
+if (allocated(wqco)) DEALLOCATE(wqco)
+if (allocated(bqcoAux)) DEALLOCATE(bqcoAux)
+if (allocated(bqco)) DEALLOCATE(bqco)
+if (allocated(wqcs)) DEALLOCATE(wqcs)
+if (allocated(bqcs)) DEALLOCATE(bqcs)
+if (allocated(vco)) DEALLOCATE(vco)
+if (allocated(vcs)) DEALLOCATE(vcs)
+if (allocated(yco)) DEALLOCATE(yco)
+if (allocated(ycs)) DEALLOCATE(ycs)
+if (allocated(yANN)) DEALLOCATE(yANN)
+if (allocated(xANN)) DEALLOCATE(xANN)
+if (allocated(xANNNorm)) DEALLOCATE(xANNNorm)
 
-DEALLOCATE(D)
-DEALLOCATE(qGl)
-DEALLOCATE(uGl)
-DEALLOCATE(vGl)
-DEALLOCATE(matrixGl)
-DEALLOCATE(matrixInvGl)
+if (allocated(qModelnorm)) DEALLOCATE(qModelnorm)
+if (allocated(uModelnorm)) DEALLOCATE(uModelnorm)
+if (allocated(vModelnorm)) DEALLOCATE(vModelnorm)
+if (allocated(qObservnorm)) DEALLOCATE(qObservnorm)
+if (allocated(uObservnorm)) DEALLOCATE(uObservnorm)
+if (allocated(vObservnorm)) DEALLOCATE(vObservnorm)
+if (allocated(qAnalysisnorm)) DEALLOCATE(qAnalysisnorm)
+if (allocated(uAnalysisnorm)) DEALLOCATE(uAnalysisnorm)
+if (allocated(vAnalysisnorm)) DEALLOCATE(vAnalysisnorm)
 
+if (allocated(D)) DEALLOCATE(D)
+if (allocated(qGl)) DEALLOCATE(qGl)
+if (allocated(uGl)) DEALLOCATE(uGl)
+if (allocated(vGl)) DEALLOCATE(vGl)
+if (allocated(matrixGl)) DEALLOCATE(matrixGl)
+if (allocated(matrixInvGl)) DEALLOCATE(matrixInvGl)
+
+if (allocated(auxMatMul)) DEALLOCATE(auxMatMul)
+if (allocated(auxMatMul2)) DEALLOCATE(auxMatMul2)
+if (allocated(transpQGl)) DEALLOCATE(transpQGl)
 
 END PROGRAM
