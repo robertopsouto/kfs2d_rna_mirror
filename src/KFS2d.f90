@@ -94,7 +94,10 @@ REAL*8  :: zonalW
 REAL*8  :: rhoWatter
 REAL*8  :: uExtForce, vExtForce
 REAL*8  :: randNoise
+REAL*8  :: initialTime, endTime
+REAL*8  :: initialPartTime, endPartTime, accumPartTime
 REAL*8  :: initialAssimTime, endAssimTime, totalAssimTime
+REAL*8  :: initialModelTime, endModelTime, totalModelTime
 REAL*8  :: initialProcessTime, endProcessTime, totalProcessTime
 REAL*8  :: a
 REAL*8  :: valNormInf, valNormSup
