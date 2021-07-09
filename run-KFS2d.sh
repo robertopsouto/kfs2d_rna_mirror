@@ -17,9 +17,12 @@ freqObsX=${6}
 freqObsY=${7} 
 percNoise=${8} 
 neuronNumber=${9}
+numthreads=${10}
 
 #DATE=$(date +%Y-%m-%d-%H%M%S)
 #starttime=starttime_${DATE}
+
+export OMP_NUM_THREADS=${numthreads}
 
 resultsdir=resultados/percNoise_$percNoise
 
@@ -49,7 +52,10 @@ fi
 
 if [[ ${assimType} -eq 2 && -d ${resultsdir}/$outputdir ]]; then
   echo "Copiando o resultado da assimilacao de FK emulada por RNA."
-  cp output/full/qAnalysisExpA_RNA.out ${resultsdir}/${outputdir}/full/qAnalysisExpA_RNA-neuronNumber_${neuronNumber}.out
+  mv output/full/qModelExpA.out ${resultsdir}/${outputdir}/full/
+  mv output/full/qObservExpA.out ${resultsdir}/${outputdir}/full/
+  #mv output/full/qAnalysisExpA.out ${resultsdir}/${outputdir}/full/
+  mv output/full/qAnalysisExpA_RNA.out ${resultsdir}/${outputdir}/full/qAnalysisExpA_RNA-neuronNumber_${neuronNumber}.out
   if [[ -L ${resultsdir}/${outputdir}/full/qAnalysisExpA_RNA.out ]]; then
 	  rm ${resultsdir}/${outputdir}/full/qAnalysisExpA_RNA.out
   fi
