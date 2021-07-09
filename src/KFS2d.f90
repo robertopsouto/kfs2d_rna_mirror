@@ -465,16 +465,16 @@ print*,'SALVOU RESULTADO DA INTEGRACAO DO MODELO - qModelExpA.out'
 
 
 call srand(0)
-do sY = 1, gridY
-    do sX = 1, gridX
-        do tS = 1, timeStep
-            randNoise = 2*rand()-1
-            !randNoiseObserv(sX,sY,tS) = randNoise * sqrt(0.01)
-            qObserv(sX,sY,tS) = qModel(sX,sY,tS) + percNoise*qModel(sX,sY,tS)*randNoise 
-            uObserv(sX,sY,tS) = uModel(sX,sY,tS) + percNoise*uModel(sX,sY,tS)*randNoise 
-            vObserv(sX,sY,tS) = vModel(sX,sY,tS) + percNoise*vModel(sX,sY,tS)*randNoise 
-        enddo
-    enddo
+do tS = 1, timeStep
+   do sY = 1, gridY
+      do sX = 1, gridX
+         randNoise = 2*rand()-1
+         !randNoiseObserv(sX,sY,tS) = randNoise * sqrt(0.01)
+         qObserv(sX,sY,tS) = qModel(sX,sY,tS) + percNoise*qModel(sX,sY,tS)*randNoise 
+         uObserv(sX,sY,tS) = uModel(sX,sY,tS) + percNoise*uModel(sX,sY,tS)*randNoise 
+         vObserv(sX,sY,tS) = vModel(sX,sY,tS) + percNoise*vModel(sX,sY,tS)*randNoise 
+      enddo
+   enddo
 enddo
 
 print*,'Gerou o ruido que sera adicionado ao modelo - gerando as observacoes '
