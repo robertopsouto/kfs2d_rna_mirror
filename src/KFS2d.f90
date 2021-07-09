@@ -456,12 +456,35 @@ vGl = vInitialCond
 
 !**************************************************************************************
 !Integrando o modelo no tempo
+! do tS = 1, timeStep
+!     call model2d(dX, dY, dT, gridX, gridY, hFluidMean, qDampCoeff, uDampCoeff, vDampCoeff, coriolis, gravityConst, qGl, uGl, vGl)
+!     qModel(:,:,tS) = qGl
+!     uModel(:,:,tS) = uGl
+!     vModel(:,:,tS) = vGl
+! enddo
+! 
+accumPartTime = 0.0d+00
+
+initialTime = omp_get_wtime()
+!**************************************************************************************
+!Integrando o modelo no tempo
 do tS = 1, timeStep
     call model2d(dX, dY, dT, gridX, gridY, hFluidMean, qDampCoeff, uDampCoeff, vDampCoeff, coriolis, gravityConst, qGl, uGl, vGl)
-    qModel(:,:,tS) = qGl
-    uModel(:,:,tS) = uGl
-    vModel(:,:,tS) = vGl
+    !initialPartTime = omp_get_wtime()
+    do sY = 1, gridY
+        do sX = 1, gridX
+           qModel(sX,sY,tS) = qGl(sX,sY)
+           uModel(sX,sY,tS) = uGl(sX,sY)
+           vModel(sX,sY,tS) = vGl(sX,sY)
+        enddo
+    enddo
+    !endPartTime = omp_get_wtime()
+    !accumPartTime = accumPartTime + (endPartTime-initialPartTime)
 enddo
+endTime = omp_get_wtime()
+print*,'Tempo de integracao do modelo  : ', endTime-initialTime
+!print*,'Tempo de atualizacao dos campos: ', accumPartTime
+
 
 if (assimType .eq. 1) then
 !Escrevendo dados em todo o dominio 2D, e todos os timesteps:
@@ -845,7 +868,7 @@ print*,'ANN Assimilation time: ', totalAssimTime, tS
 write(40,*)'ANN Assimilation time: ', totalAssimTime, tS
 
 
-if (assimType .eq. 3) then !Processo de desnormalizacao da saida de RNA
+if (assimType .eq. 2) then !Processo de desnormalizacao da saida de RNA
 !	qAnalysis = (yANN * (maxval(qModel) - minval(qModel)) - maxval(qModel) * valNormInf +&
 !			& minval(qModel) * valNormSup) / (valNormSup - valNormInf)
 !Escrevendo dados em todo o dominio 2D, e todos os timesteps:
