@@ -460,6 +460,7 @@ do tS = 1, timeStep
     vModel(:,:,tS) = vGl
 enddo
 
+if (assimType .eq. 1) then
 !Escrevendo dados em todo o dominio 2D, e todos os timesteps:
 open(10, file = 'output/full/qModelExpA.out')
 !open(11, file = 'output/full/uModelExpA.out')
@@ -476,9 +477,8 @@ enddo
 close(10)
 !close(11)
 !close(12)
-
 print*,'SALVOU RESULTADO DA INTEGRACAO DO MODELO - qModelExpA.out'
-
+endif
 
 call srand(0)
 do sY = 1, gridY
@@ -499,6 +499,7 @@ print*,'Gerou o ruido que sera adicionado ao modelo - gerando as observacoes '
 !uObserv = uModel + randNoiseObserv
 !vObserv = vModel + randNoiseObserv
 
+if (assimType .eq. 1) then
 !Escrevendo dados em todo o dominio 2D, e todos os timesteps:
 open(10, file = 'output/full/qObservExpA.out')
 !open(11, file = 'output/full/uObservExpA.out')
@@ -515,8 +516,8 @@ enddo
 close(10)
 !close(11)
 !close(12)
-
 print*,'SALVOU AS OBSERVACOES -- MODELO + Rand - qObservExpA.out'
+endif
 
 qGl = qInitialCond
 uGl = uInitialCond
@@ -839,7 +840,7 @@ print*,'ANN Assimilation time: ', totalAssimTime, tS
 write(40,*)'ANN Assimilation time: ', totalAssimTime, tS
 
 
-if (assimType .eq. 2) then !Processo de desnormalizacao da saida de RNA
+if (assimType .eq. 3) then !Processo de desnormalizacao da saida de RNA
 !	qAnalysis = (yANN * (maxval(qModel) - minval(qModel)) - maxval(qModel) * valNormInf +&
 !			& minval(qModel) * valNormSup) / (valNormSup - valNormInf)
 !Escrevendo dados em todo o dominio 2D, e todos os timesteps:
@@ -860,7 +861,7 @@ close(10)
 !close(12)		
 endif
 
-if (assimType .eq. 1) then 
+if (assimType .eq. 3) then 
 !Escrevendo dados em todo o dominio 2D, e todos os timesteps:
 open(10, file = 'output/full/qAnalysisExpA.out')
 !open(11, file = 'output/full/uAnalysisExpA.out')
