@@ -145,14 +145,17 @@ DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: wqco
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: bqcoAux, bqco
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: wqcs
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: bqcs
-DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: vco
-DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: vcs
-DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: yco
-DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: ycs
+DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:,:) :: vco
+DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:,:) :: vcs
+DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:,:) :: yco
+DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:,:) :: ycs
 
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:) :: error
 
 DOUBLE PRECISION :: qModelMax, qModelMin
+
+INTEGER :: numThreads, tid, omp_get_num_threads, omp_get_thread_num
+DOUBLE PRECISION :: omp_get_wtime
 
 character(len=7) :: fnametemp
 character(len=6) :: assimType_char, gridX_char, gridY_char, timeStep_char
@@ -175,6 +178,8 @@ print*,"command_argument_count(): ",command_argument_count()
  call get_command_argument(8,percNoise_char)
  call get_command_argument(9,neuronNumber_char)
 
+print*, "gridX: ", gridX_char
+print*, "gridY: ", gridY_char
 print*, "freqObsX: ", freqObsX_char
 print*, "freqObsY: ", freqObsY_char
 print*, "percNoise: ", percNoise_char
@@ -190,11 +195,6 @@ freqObsY_char=trim(freqObsY_char)
 percNoise_char=trim(percNoise_char)
 neuronNumber_char=trim(neuronNumber_char)
 
-
-! print*, "freqObsX: ", freqObsX_char
-! print*, "freqObsY: ", freqObsY_char
-! print*, "percNoise: ", percNoise_char
-! print*, "neuronNumber: ", neuronNumber_char
 
 fnametemp = 'temp.dat'
 write (fnametemp,*) assimType_char
@@ -281,7 +281,8 @@ vGl = 0.0
 
 !**************************************************************************************
 ! Storing the time spent
-call CPU_TIME(initialProcessTime)
+initialProcessTime = omp_get_wtime()
+
 if (assimType .eq. 1) then !Assimilacao com FK
    open(40, file='output/computingFKTime.out')
 endif
@@ -343,10 +344,20 @@ ALLOCATE(bqcoAux(1,neuronNumber))
 ALLOCATE(bqco(neuronNumber,1))
 ALLOCATE(wqcs(1,neuronNumber))
 ALLOCATE(bqcs(1,1))
-ALLOCATE(vco(neuronNumber,1))
-ALLOCATE(vcs(1,1))
-ALLOCATE(yco(neuronNumber,1))
-ALLOCATE(ycs(1,1))
+
+!$OMP PARALLEL
+numThreads = omp_get_num_threads()
+!print*, "omp_get_thread_num(): ", omp_get_thread_num()
+!$OMP END PARALLEL
+
+print*
+print*, "numThreads: ", numThreads
+print*
+
+ALLOCATE(vco(neuronNumber,1,numThreads))
+ALLOCATE(vcs(1,1,numThreads))
+ALLOCATE(yco(neuronNumber,1,numThreads))
+ALLOCATE(ycs(1,1,numThreads))
 
 !Normalization
 ALLOCATE(qObservnorm(gridX,gridY,timeStep))
@@ -597,8 +608,8 @@ yANN = qModelnorm
 !yANN = uModelnorm
 !yANN = vModelnorm
 
-counterFreqAssim = 0
-
+ counterFreqAssim = 0
+ totalAssimTime = 0.0d+00
 
 do tS = 1, timeStep
     call model2d(dX, dY, dT, gridX, gridY, hFluidMean, qDampCoeff, uDampCoeff, vDampCoeff, coriolis, gravityConst, qGl, uGl, vGl)
@@ -763,9 +774,9 @@ do tS = 1, timeStep
 
         CASE (2)
 	    !**************************************************************************
-            call CPU_TIME(initialAssimTime)
+
 	    print*, 'ANN Assimilation cycle - timeStep', tS
-            counterFreqAssim = 0
+        counterFreqAssim = 0
 
 	    counterCol = 1
             do sX = 1, gridX
@@ -780,34 +791,33 @@ do tS = 1, timeStep
                 enddo
             enddo
 
-	        print*,'TUDO PRONTO PARA A RNA'
+	        !print*,'TUDO PRONTO PARA A RNA'
 
-            !do i = 1, gridX*gridY
-            i=1
+            initialAssimTime = omp_get_wtime()
+!$OMP PARALLEL DO         &
+!$OMP DEFAULT(shared)     &
+!$OMP PRIVATE(sX,sY,i,tid)                 
             do sX = 1, gridX
-                do sY = 1, gridY          
-                   vco(:,1) = matmul(wqco(:,:),xANN(:,i))
-                   vco(:,1) = vco(:,1) - (bqco(:,1))
-                   yco(:,1) = (1.d0 - DEXP(-vco(:,1))) / (1.d0 + DEXP(-vco(:,1)))
-                   !!camada de saida
-                   vcs(:,1) = matmul(wqcs(:,:), yco(:,1))
-                   vcs(:,1) = vcs(:,1) - bqcs(:,1)
-                   yANN(:,i,tS) = (1.d0-DEXP(-vcs(:,1)))/(1.d0+DEXP(-vcs(:,1)))
-                   !qGl(sX,sY) = (yANN(:,i,tS)*(maxval(qModel)-minval(qModel)) + maxval(qModel) + minval(qModel))/2.0
+                do sY = 1, gridY
+                   tid = omp_get_thread_num() + 1
+                   i = (sX-1)*gridY + sY
+                   vco(:,1,tid) = matmul(wqco(:,:),xANN(:,i))
+                   vco(:,1,tid) = vco(:,1,tid) - (bqco(:,1))
+                   yco(:,1,tid) = (1.d0 - DEXP(-vco(:,1,tid))) / (1.d0 + DEXP(-vco(:,1,tid)))
+                   vcs(:,1,tid) = matmul(wqcs(:,:), yco(:,1,tid))
+                   vcs(:,1,tid) = vcs(:,1,tid) - bqcs(:,1)
+                   yANN(:,i,tS) = (1.d0-DEXP(-vcs(:,1,tid)))/(1.d0+DEXP(-vcs(:,1,tid)))
                    qGl(sX,sY) = (yANN(1,i,tS)*(qModelMax-qModelMin) + qModelMax + qModelMin)/2.0 
-                   i = i + 1
                 enddo
             enddo
-
+!$OMP END PARALLEL DO
+            endAssimTime = omp_get_wtime()
+            totalAssimTime = totalAssimTime + (endAssimTime - initialAssimTime)
+           
             qAnalysis(:,:,tS) = qGl
-            
-            
-            print*,'PASSAMOS PELA RNA'
 
-            call CPU_TIME(endAssimTime)
-            totalAssimTime = endAssimTime - initialAssimTime
-            print*,'ANN Assimilation time: ', totalAssimTime, tS
-            write(40,*)'ANN Assimilation time: ', totalAssimTime, tS
+            
+            !print*,'PASSAMOS PELA RNA'
 
         CASE(3)
           print*,'Chamar FPGA'
@@ -816,6 +826,10 @@ do tS = 1, timeStep
 
     endif
 enddo
+
+print*,'ANN Assimilation time: ', totalAssimTime, tS
+write(40,*)'ANN Assimilation time: ', totalAssimTime, tS
+
 
 if (assimType .eq. 2) then !Processo de desnormalizacao da saida de RNA
 !	qAnalysis = (yANN * (maxval(qModel) - minval(qModel)) - maxval(qModel) * valNormInf +&
@@ -916,11 +930,12 @@ close(10)
 
 endif
 
-call CPU_TIME(endProcessTime)
+endProcessTime = omp_get_wtime()
+
 totalProcessTime = endProcessTime - initialProcessTime
 print*,'Total Process time: ', totalProcessTime
-
 write(40,*) 'Total Process time:', totalProcessTime
+
 close(40)
 
 print*,'FIM'
