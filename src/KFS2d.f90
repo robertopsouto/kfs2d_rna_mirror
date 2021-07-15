@@ -889,7 +889,7 @@ close(10)
 !close(12)		
 endif
 
-if (assimType .eq. 3) then 
+if (assimType .eq. 1) then 
 !Escrevendo dados em todo o dominio 2D, e todos os timesteps:
 open(10, file = 'output/full/qAnalysisExpA.out')
 !open(11, file = 'output/full/uAnalysisExpA.out')
