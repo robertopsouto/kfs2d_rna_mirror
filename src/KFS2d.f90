@@ -142,8 +142,8 @@ DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: xAnalysis
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: identityMatrix
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: yFcast
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: auxMatMul, auxMatMul2
-DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: xANNNorm, xANN, transpQGl
-DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:,:) :: yANN
+DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: xANN, transpQGl
+!DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:,:) :: yANN
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: wqco
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: bqcoAux, bqco
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: wqcs
@@ -342,9 +342,8 @@ if (assimType .eq. 1) then
 endif
 ALLOCATE(error(timeStep))
 
-ALLOCATE(yANN(1,gridX*gridY,timeStep))
+!ALLOCATE(yANN(1,gridX*gridY,timeStep))
 ALLOCATE(xANN(2, gridX*gridY))
-ALLOCATE(xANNNorm(2, gridX*gridY))
 ALLOCATE(transpQGl(gridX, gridY))
 
 ALLOCATE(wqco(neuronNumber,2))
@@ -641,7 +640,7 @@ endif
 !**************************************************************************************
 ! Inicializacao da variavel yANN para ser usada na RNA
 ! tirar o comentario da linha que se deseja avaliar
-yANN = qModelnorm
+!yANN = qModelnorm
 !yANN = uModelnorm
 !yANN = vModelnorm
 
@@ -843,8 +842,8 @@ do tS = 1, timeStep
                    yco(:,1,tid) = (1.d0 - DEXP(-vco(:,1,tid))) / (1.d0 + DEXP(-vco(:,1,tid)))
                    vcs(:,1,tid) = matmul(wqcs(:,:), yco(:,1,tid))
                    vcs(:,1,tid) = vcs(:,1,tid) - bqcs(:,1)
-                   yANN(:,i,tS) = (1.d0-DEXP(-vcs(:,1,tid)))/(1.d0+DEXP(-vcs(:,1,tid)))
-                   qGl(sX,sY) = (yANN(1,i,tS)*(qModelMax-qModelMin) + qModelMax + qModelMin)/2.0 
+                   ycs(:,1,tid) = (1.d0-DEXP(-vcs(:,1,tid)))/(1.d0+DEXP(-vcs(:,1,tid)))
+                   qGl(sX,sY) = (ycs(1,1,tid)*(qModelMax-qModelMin) + qModelMax + qModelMin)/2.0 
                 enddo
             enddo
 !$OMP END PARALLEL DO
@@ -868,9 +867,7 @@ print*,'ANN Assimilation time: ', totalAssimTime, tS
 write(40,*)'ANN Assimilation time: ', totalAssimTime, tS
 
 
-if (assimType .eq. 2) then !Processo de desnormalizacao da saida de RNA
-!	qAnalysis = (yANN * (maxval(qModel) - minval(qModel)) - maxval(qModel) * valNormInf +&
-!			& minval(qModel) * valNormSup) / (valNormSup - valNormInf)
+if (assimType .eq. 2) then 
 !Escrevendo dados em todo o dominio 2D, e todos os timesteps:
 open(10, file = 'output/full/qAnalysisExpA_RNA.out')
 !open(11, file = 'output/full/uAnalysisExpA.out')
@@ -1018,9 +1015,9 @@ if (allocated(vco)) DEALLOCATE(vco)
 if (allocated(vcs)) DEALLOCATE(vcs)
 if (allocated(yco)) DEALLOCATE(yco)
 if (allocated(ycs)) DEALLOCATE(ycs)
-if (allocated(yANN)) DEALLOCATE(yANN)
+!if (allocated(yANN)) DEALLOCATE(yANN)
 if (allocated(xANN)) DEALLOCATE(xANN)
-if (allocated(xANNNorm)) DEALLOCATE(xANNNorm)
+!if (allocated(xANNNorm)) DEALLOCATE(xANNNorm)
 
 if (allocated(qModelnorm)) DEALLOCATE(qModelnorm)
 if (allocated(uModelnorm)) DEALLOCATE(uModelnorm)
