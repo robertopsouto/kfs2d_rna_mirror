@@ -94,10 +94,10 @@ REAL*8  :: zonalW
 REAL*8  :: rhoWatter
 REAL*8  :: uExtForce, vExtForce
 REAL*8  :: randNoise
-REAL*8  :: initialTime, endTime
-REAL*8  :: initialPartTime, endPartTime, accumPartTime
+REAL*8  :: initialModel2DTime, endModel2DTime, totalModel2DTime
+REAL*8  :: initialFKTime, endFKTime, totalFKTime
+REAL*8  :: initialANNTime, endANNTime, totalANNTime
 REAL*8  :: initialAssimTime, endAssimTime, totalAssimTime
-REAL*8  :: initialModelTime, endModelTime, totalModelTime
 REAL*8  :: initialProcessTime, endProcessTime, totalProcessTime
 REAL*8  :: a
 REAL*8  :: valNormInf, valNormSup
@@ -288,12 +288,12 @@ vGl = 0.0
 ! Storing the time spent
 initialProcessTime = omp_get_wtime()
 
-if (assimType .eq. 1) then !Assimilacao com FK
-   open(40, file='output/computingFKTime.out')
-endif
-if (assimType .eq. 2) then !Assimilacao com RNA
-   open(40, file='output/computingANNTime.out')
-endif
+!if (assimType .eq. 1) then !Assimilacao com FK
+!   open(40, file='output/computingFKTime.out')
+!endif
+!if (assimType .eq. 2) then !Assimilacao com RNA
+!   open(40, file='output/computingANNTime.out')
+!endif
 
 
 !**************************************************************************************
@@ -434,20 +434,20 @@ qInitialCond = qInitialCond + randNoise * D * (sqrt(2.0))
 uInitialCond = uInitialCond + randNoise * D * (sqrt(2.0))
 vInitialCond = vInitialCond + randNoise * D * (sqrt(2.0))
 
-open(10, file = 'output/qInitialCondExpA.out')
+!open(10, file = 'output/qInitialCondExpA.out')
 !open(11, file = 'output/uInitialCondExpA.out')
 !open(12, file = 'output/vInitialCondExpA.out')
-do sX = 1, gridX
-    do sY = 1, gridY
-        write(10,*)qInitialCond(sX, sY)
+!do sX = 1, gridX
+!    do sY = 1, gridY
+!        write(10,*)qInitialCond(sX, sY)
         !write(11,*)uInitialCond(sX, sY)
         !write(12,*)vInitialCond(sX, sY)
-    enddo
-enddo
-close(10)
+!    enddo
+!enddo
+!close(10)
 !close(11)
 !close(12)
-print*,'SALVOU CONDICAO INICIAL - qInitialCondExpA.out'
+!print*,'SALVOU CONDICAO INICIAL - qInitialCondExpA.out'
 
 qGl = qInitialCond
 uGl = uInitialCond
@@ -462,14 +462,12 @@ vGl = vInitialCond
 !     vModel(:,:,tS) = vGl
 ! enddo
 ! 
-accumPartTime = 0.0d+00
 
-initialTime = omp_get_wtime()
+initialModel2DTime = omp_get_wtime()
 !**************************************************************************************
 !Integrando o modelo no tempo
 do tS = 1, timeStep
     call model2d(dX, dY, dT, gridX, gridY, hFluidMean, qDampCoeff, uDampCoeff, vDampCoeff, coriolis, gravityConst, qGl, uGl, vGl)
-    !initialPartTime = omp_get_wtime()
     do sY = 1, gridY
         do sX = 1, gridX
            qModel(sX,sY,tS) = qGl(sX,sY)
@@ -477,22 +475,19 @@ do tS = 1, timeStep
            vModel(sX,sY,tS) = vGl(sX,sY)
         enddo
     enddo
-    !endPartTime = omp_get_wtime()
-    !accumPartTime = accumPartTime + (endPartTime-initialPartTime)
 enddo
-endTime = omp_get_wtime()
-print*,'Tempo de integracao do modelo  : ', endTime-initialTime
-!print*,'Tempo de atualizacao dos campos: ', accumPartTime
+endModel2DTime = omp_get_wtime()
+print*,'Tempo de integracao do modelo para gerar os dados: ', endModel2DTime-initialModel2DTime
+print*
 
-
-if (assimType .eq. 1) then
+!if (assimType .eq. 1) then
 !Escrevendo dados em todo o dominio 2D, e todos os timesteps:
 open(10, file = 'output/full/qModelExpA.out')
 !open(11, file = 'output/full/uModelExpA.out')
 !open(12, file = 'output/full/vModelExpA.out')
-do tS = 1, timeStep
-    do sX = 1, gridX
-        do sY = 1, gridY
+do tS = freqObsT, timeStep, freqObsT
+    do sX = freqObsX, gridX, freqObsX
+        do sY = freqObsY, gridY, freqObsY
             write(10,'(6X,F10.6)',advance='no') qModel(sX, sY, tS)
             !write(11,'(6X,F8.5)',advance='no') uModel(sX, sY, tS)
             !write(12,'(6X,F8.5)',advance='no') vModel(sX, sY, tS)
@@ -503,9 +498,9 @@ close(10)
 !close(11)
 !close(12)
 print*,'SALVOU RESULTADO DA INTEGRACAO DO MODELO - qModelExpA.out'
-endif
+!endif
 
-initialTime = omp_get_wtime()
+initialModel2DTime = omp_get_wtime()
 call srand(0)
 do tS = 1, timeStep
    do sY = 1, gridY
@@ -518,9 +513,9 @@ do tS = 1, timeStep
       enddo
    enddo
 enddo
-endTime = omp_get_wtime()
-print*,'Tempo de insercao do ruido  : ', endTime-initialTime
-print*,'Gerou o ruido que sera adicionado ao modelo - gerando as observacoes '
+endModel2DTime = omp_get_wtime()
+print*,'Tempo de inclusao de ruido para gerar as observacoes: ', endModel2DTime-initialModel2DTime
+print*
 
 !qObserv = qModel + randNoiseObserv
 !uObserv = uModel + randNoiseObserv
@@ -646,9 +641,18 @@ endif
 
  counterFreqAssim = 0
  totalAssimTime = 0.0d+00
+ totalModel2DTime = 0.0d+00
+ totalANNTime = 0.0d+00
+ totalFKTime = 0.0d+00
 
+initialAssimTime = omp_get_wtime()
 do tS = 1, timeStep
-    call model2d(dX, dY, dT, gridX, gridY, hFluidMean, qDampCoeff, uDampCoeff, vDampCoeff, coriolis, gravityConst, qGl, uGl, vGl)
+
+    initialModel2DTime = omp_get_wtime()
+       call model2d(dX, dY, dT, gridX, gridY, hFluidMean, qDampCoeff, uDampCoeff, vDampCoeff, coriolis, gravityConst, qGl, uGl, vGl)
+    endModel2DTime = omp_get_wtime()
+    totalModel2DTime = totalModel2DTime + (endModel2DTime - initialModel2DTime)
+
     qAnalysis(:,:,tS) = qGl
     uAnalysis(:,:,tS) = uGl
     vAnalysis(:,:,tS) = vGl
@@ -673,7 +677,7 @@ do tS = 1, timeStep
         SELECT CASE (assimType)
         CASE (1)
 	    !**************************************************************************
-            call CPU_TIME(initialAssimTime)
+            initialFKTime = omp_get_wtime()
             print*, 'FK Assimilation cycle - timeStep', tS
             counterFreqAssim = 0
             do i = 1, dKalmanMatrix - 1
@@ -802,11 +806,11 @@ do tS = 1, timeStep
             uAnalysis(:,:,tS) = uGl
             vAnalysis(:,:,tS) = vGl
 
+            endFKTime = omp_get_wtime()
+            totalFKTime = totalFKTime + (endFKTime - initialFKTime)
 
-            call CPU_TIME(endAssimTime)
-            totalAssimTime = endAssimTime - initialAssimTime
-            print*,'FK Assimilation time: ', totalAssimTime, tS
-            write(40,*) 'FK Assimilation time: ', totalAssimTime, tS
+            print*,'FK Assimilation cycle time (s): ', (endFKTime - initialFKTime)
+            print*
 
         CASE (2)
 	    !**************************************************************************
@@ -817,7 +821,7 @@ do tS = 1, timeStep
 	    counterCol = 1
             do sX = 1, gridX
                 do sY = 1, gridY
-                    xANN(1,counterCol) = qModelnorm(sX, sY,tS)
+                    xANN(1,counterCol) = qModelnorm(sX,sY,tS)
                     xANN(2,counterCol) = qObservnorm(sX,sY,tS)
                     !xANN(1,counterCol) = uModelnorm(sX, sY,tS)
                     !xANN(2,counterCol) = uObservnorm(sX,sY,tS)
@@ -829,7 +833,7 @@ do tS = 1, timeStep
 
 	        !print*,'TUDO PRONTO PARA A RNA'
 
-            initialAssimTime = omp_get_wtime()
+            initialANNTime = omp_get_wtime()
 !$OMP PARALLEL DO         &
 !$OMP DEFAULT(shared)     &
 !$OMP PRIVATE(sX,sY,i,tid)                 
@@ -847,11 +851,10 @@ do tS = 1, timeStep
                 enddo
             enddo
 !$OMP END PARALLEL DO
-            endAssimTime = omp_get_wtime()
-            totalAssimTime = totalAssimTime + (endAssimTime - initialAssimTime)
+            endANNTime = omp_get_wtime()
+            totalANNTime = totalANNTime + (endANNTime - initialANNTime)
            
             qAnalysis(:,:,tS) = qGl
-
             
             !print*,'PASSAMOS PELA RNA'
 
@@ -863,8 +866,8 @@ do tS = 1, timeStep
     endif
 enddo
 
-print*,'ANN Assimilation time: ', totalAssimTime, tS
-write(40,*)'ANN Assimilation time: ', totalAssimTime, tS
+endAssimTime = omp_get_wtime()
+totalAssimTime = totalAssimTime + (endAssimTime - initialAssimTime)
 
 
 if (assimType .eq. 2) then 
@@ -872,9 +875,9 @@ if (assimType .eq. 2) then
 open(10, file = 'output/full/qAnalysisExpA_RNA.out')
 !open(11, file = 'output/full/uAnalysisExpA.out')
 !open(12, file = 'output/full/vAnalysisExpA.out')
-do tS = 1, timeStep
-    do sX = 1, gridX
-        do sY = 1, gridY
+do tS = freqObsT, timeStep, freqObsT
+    do sX = freqObsX, gridX, freqObsX
+        do sY = freqObsY, gridY, freqObsY
             write(10,'(6X,F10.6)',advance='no') qAnalysis(sX, sY, tS)
 	    !write(11,'(6X,F8.5)',advance='no') uAnalysis(sX, sY, tS)
 	    !write(12,'(6X,F8.5)',advance='no') vAnalysis(sX, sY, tS)
@@ -967,11 +970,24 @@ endif
 endProcessTime = omp_get_wtime()
 
 totalProcessTime = endProcessTime - initialProcessTime
-print*,'Total Process time: ', totalProcessTime
-write(40,*) 'Total Process time:', totalProcessTime
 
-close(40)
+print*
+print*
+   print*,'Total time              : ', totalProcessTime
+   print*,'Assimilation time       : ', totalAssimTime
 
+if (assimType .eq. 1) then 
+   print*,'FK time                 : ', totalFKTime
+endif
+
+if (assimType .eq. 2) then 
+   print*,'ANN time                : ', totalANNTime
+   print*,'Model 2D time           : ', totalModel2DTime
+endif
+
+!close(40)
+
+print*
 print*,'FIM'
 
 ! Initial condition data
