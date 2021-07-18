@@ -485,7 +485,7 @@ print*
 open(10, file = 'output/full/qModelExpA.out')
 !open(11, file = 'output/full/uModelExpA.out')
 !open(12, file = 'output/full/vModelExpA.out')
-do tS = freqObsT, timeStep, freqObsT
+do tS = 1, timeStep
     do sX = freqObsX, gridX, freqObsX
         do sY = freqObsY, gridY, freqObsY
             write(10,'(6X,F10.6)',advance='no') qModel(sX, sY, tS)
@@ -875,7 +875,7 @@ if (assimType .eq. 2) then
 open(10, file = 'output/full/qAnalysisExpA_RNA.out')
 !open(11, file = 'output/full/uAnalysisExpA.out')
 !open(12, file = 'output/full/vAnalysisExpA.out')
-do tS = freqObsT, timeStep, freqObsT
+do tS = 1, timeStep
     do sX = freqObsX, gridX, freqObsX
         do sY = freqObsY, gridY, freqObsY
             write(10,'(6X,F10.6)',advance='no') qAnalysis(sX, sY, tS)
