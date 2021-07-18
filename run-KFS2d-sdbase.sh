@@ -28,10 +28,12 @@ neuronNumber=${9}
 #DATE=$(date +%Y-%m-%d-%H%M%S)
 #starttime=starttime_${DATE}
 
-#module load python/3.8.2
-#module load gcc/8.3
-#source /scratch/cenapadrjsd/rpsouto/usr/local/spack/git/spack/share/spack/setup-env.sh
-#spack load -r openblas
+module load python/3.8.2
+module load gcc/8.3
+source /scratch/cenapadrjsd/rpsouto/usr/local/spack/git/spack/share/spack/setup-env.sh
+spack load -r openblas
+spack load -r gperftools
+export MALLOCSTATS=1
 
 resultsdir=resultados/percNoise_$percNoise
 
