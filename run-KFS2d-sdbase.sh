@@ -50,10 +50,8 @@ rm output/*.out
 rm output/full/*.out
 rm output/training/*.out
 
-executavel=/scratch/cenapadrjsd/rpsouto/projetos/g-assimila/gitlab/kfs2d_rna/KFS2d
+executavel=KFS2d
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
-
-ldd $executavel
 
 #Executa o KFS2d 
 #srun  -N 1 -c $SLURM_CPUS_PER_TASK $EXEC $assimType $gridX $gridY $timeStep $freqObsT $freqObsX $freqObsY $percNoise $neuronNumber 2>&1 | tee output.log 
@@ -65,14 +63,13 @@ if [[ ${assimType} -eq 1 ]]; then
   cp output.log ${resultsdir}/${outputdir}/output_FK.log
 fi
 
-if [[ ${assimType} -eq 2 && -d ${resultsdir}/$outputdir ]]; then
+if [[ ${assimType} -eq 2 && -d ${resultsdir}/${outputdir} ]]; then
   echo "Copiando o resultado da assimilacao de FK emulada por RNA."
-  #cp output/full/qAnalysisExpA_RNA.out ${resultsdir}/${outputdir}/full/qAnalysisExpA_RNA_omp-${SLURM_CPUS_PER_TASK}_job-${SLURM_JOB_ID}.out
-  if [[ -L ${resultsdir}/${outputdir}/full/qAnalysisExpA_RNA.out ]]; then
-	  rm ${resultsdir}/${outputdir}/full/qAnalysisExpA_RNA.out
-  fi
-  #ln -s -r ${resultsdir}/${outputdir}/full/qAnalysisExpA_RNA_omp-${SLURM_CPUS_PER_TASK}_job-${SLURM_JOB_ID}.out ${resultsdir}/${outputdir}/full/qAnalysisExpA_RNA.out
-  cp output.log ${resultsdir}/${outputdir}/output_RNA-neuronNumber_omp-${SLURM_CPUS_PER_TASK}_job-${SLURM_JOB_ID}.log
+  mkdir -p ${resultsdir}/${outputdir}/full/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}
+  cp output/full/qModelExpA.out        ${resultsdir}/${outputdir}/full/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}/
+  cp output/full/qAnalysisExpA_RNA.out ${resultsdir}/${outputdir}/full/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}/
+  cp slurm-${SLURM_JOB_ID}.out ${resultsdir}/${outputdir}/full/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}/
+  cp output.log ${resultsdir}/${outputdir}/full/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}/
 fi
 
 
