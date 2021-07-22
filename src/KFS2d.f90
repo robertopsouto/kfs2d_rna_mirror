@@ -500,8 +500,12 @@ close(10)
 print*,'SALVOU RESULTADO DA INTEGRACAO DO MODELO - qModelExpA.out'
 !endif
 
-initialModel2DTime = omp_get_wtime()
 call srand(0)
+
+initialModel2DTime = omp_get_wtime()
+! $OMP PARALLEL DO ORDERED        &
+! $OMP DEFAULT(shared)     &
+! $OMP PRIVATE(tS,sY,sX,randNoise)                 
 do tS = 1, timeStep
    do sY = 1, gridY
       do sX = 1, gridX
@@ -513,6 +517,8 @@ do tS = 1, timeStep
       enddo
    enddo
 enddo
+! $OMP END PARALLEL DO
+
 endModel2DTime = omp_get_wtime()
 print*,'Tempo de inclusao de ruido para gerar as observacoes: ', endModel2DTime-initialModel2DTime
 print*
@@ -521,14 +527,14 @@ print*
 !uObserv = uModel + randNoiseObserv
 !vObserv = vModel + randNoiseObserv
 
-if (assimType .eq. 1) then
+!if (assimType .eq. 1) then
 !Escrevendo dados em todo o dominio 2D, e todos os timesteps:
 open(10, file = 'output/full/qObservExpA.out')
 !open(11, file = 'output/full/uObservExpA.out')
 !open(12, file = 'output/full/vObservExpA.out')
 do tS = 1, timeStep
-    do sX = 1, gridX
-        do sY = 1, gridY
+    do sX = freqObsX, gridX, freqObsX
+        do sY = freqObsY, gridY, freqObsY
             write(10,'(6X,F10.6)',advance='no') qObserv(sX, sY, tS)
             !write(11,'(6X,F8.5)',advance='no') uObserv(sX, sY, tS)
             !write(12,'(6X,F8.5)',advance='no') vObserv(sX, sY, tS)
@@ -539,7 +545,7 @@ close(10)
 !close(11)
 !close(12)
 print*,'SALVOU AS OBSERVACOES -- MODELO + Rand - qObservExpA.out'
-endif
+!endif
 
 qGl = qInitialCond
 uGl = uInitialCond
@@ -895,8 +901,8 @@ open(10, file = 'output/full/qAnalysisExpA.out')
 !open(11, file = 'output/full/uAnalysisExpA.out')
 !open(12, file = 'output/full/vAnalysisExpA.out')
 do tS = 1, timeStep
-    do sX = 1, gridX
-        do sY = 1, gridY
+    do sX = freqObsX, gridX, freqObsX
+        do sY = freqObsY, gridY, freqObsY
             write(10,'(6X,F10.6)',advance='no') qAnalysis(sX, sY, tS)
 	    !write(11,'(6X,F8.5)',advance='no') uAnalysis(sX, sY, tS)
 	    !write(12,'(6X,F8.5)',advance='no') vAnalysis(sX, sY, tS)

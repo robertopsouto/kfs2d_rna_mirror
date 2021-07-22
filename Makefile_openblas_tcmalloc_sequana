@@ -7,13 +7,14 @@ FFLAGS = -c -O2 -fopenmp
 #Opcoes de compilacao
 FFLAGSOPT = -O2 -fopenmp 
 
+OPENBLASDIR=/scratch/cenapadrjsd/rpsouto/sequana/usr/local/spack/git/spack/opt/spack/linux-rhel7-skylake_avx512/gcc-8.3.0/openblas-0.3.17-ck6hcqpjimnteey7ar3bua6qtomuqojz
+GPERTOOLSDIR=/scratch/cenapadrjsd/rpsouto/sequana/usr/local/spack/git/spack/opt/spack/linux-rhel7-skylake_avx512/gcc-8.3.0/gperftools-2.8.1-eczyaml7mrzlei5mg5rproixn4ouedbn
+
 #Bibliotecas
 #FFLIBS = -llapack -lblas -g -fcheck=all -Wall -fbacktrace -fopenmp #-tcmalloc-minimal4 
-FFLIBS = -I/scratch/cenapadrjsd/rpsouto/sequana/usr/local/spack/git/spack/opt/spack/linux-rhel7-ivybridge/gcc-8.3.0/openblas-0.3.16-2kswcwzq3cdanwktbo7x2rou3zkboq4d/include \
-         -L/scratch/cenapadrjsd/rpsouto/sequana/usr/local/spack/git/spack/opt/spack/linux-rhel7-ivybridge/gcc-8.3.0/openblas-0.3.16-2kswcwzq3cdanwktbo7x2rou3zkboq4d/lib -lopenblas \
+FFLIBS = -I$(OPENBLASDIR)/include -L$(OPENBLASDIR)/lib -lopenblas \
          -g -fcheck=all -Wall -fbacktrace -fopenmp \
-         -I/scratch/cenapadrjsd/rpsouto/sequana/usr/local/spack/git/spack/opt/spack/linux-rhel7-ivybridge/gcc-8.3.0/gperftools-2.8.1-q7r3hro4lq7c6fkxqs47bne66ghogsrb/include \
-         -L/scratch/cenapadrjsd/rpsouto/sequana/usr/local/spack/git/spack/opt/spack/linux-rhel7-ivybridge/gcc-8.3.0/gperftools-2.8.1-q7r3hro4lq7c6fkxqs47bne66ghogsrb/lib -ltcmalloc_minimal
+         -I$(GPERTOOLSDIR)/include -L$(GPERTOOLSDIR)/lib -ltcmalloc
 
 #Objetos
 objects = kfsFunctions.o KFS2d.o

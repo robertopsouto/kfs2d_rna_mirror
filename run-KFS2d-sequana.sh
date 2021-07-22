@@ -63,13 +63,18 @@ srun -N 1 -n 1 -c $SLURM_CPUS_PER_TASK $executavel $assimType $gridX $gridY $tim
 
 if [[ ${assimType} -eq 1 ]]; then
   echo "Copiando o resultado da assimilacao por FK e os dados para treinamento da RNA."
-  cp -r -p output/ ${resultsdir}/$outputdir
-  cp output.log ${resultsdir}/${outputdir}/output_FK.log
+  mkdir -p ${resultsdir}/${outputdir}/full/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}
+  cp slurm-${SLURM_JOB_ID}.out ${resultsdir}/${outputdir}/full/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}/
+  cp output.log ${resultsdir}/${outputdir}/full/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}/
+  cp output/full/*.out ${resultsdir}/${outputdir}/full/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}/
+  mkdir -p ${resultsdir}/${outputdir}/training/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}
+  cp output/training/*.out ${resultsdir}/${outputdir}/training/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}/
 fi
 
 if [[ ${assimType} -eq 2 && -d ${resultsdir}/${outputdir} ]]; then
   echo "Copiando o resultado da assimilacao de FK emulada por RNA."
   mkdir -p ${resultsdir}/${outputdir}/full/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}
+  cp output/full/qObservExpA.out       ${resultsdir}/${outputdir}/full/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}/
   cp output/full/qModelExpA.out        ${resultsdir}/${outputdir}/full/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}/
   cp output/full/qAnalysisExpA_RNA.out ${resultsdir}/${outputdir}/full/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}/
   cp slurm-${SLURM_JOB_ID}.out ${resultsdir}/${outputdir}/full/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}/
