@@ -79,6 +79,8 @@ if [[ ${assimType} -eq 2 && -d ${resultsdir}/${outputdir} ]]; then
   cp output/full/qAnalysisExpA_RNA.out ${resultsdir}/${outputdir}/full/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}/
   cp slurm-${SLURM_JOB_ID}.out ${resultsdir}/${outputdir}/full/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}/
   cp output.log ${resultsdir}/${outputdir}/full/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}/
+  mkdir -p ${resultsdir}/${outputdir}/training/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}
+  cp output/training/*.out ${resultsdir}/${outputdir}/training/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}/
 fi
 
 
