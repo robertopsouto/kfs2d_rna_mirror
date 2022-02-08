@@ -11,12 +11,12 @@ qa = load('qAnalysisExpA.out');
 % dado da rede
 qar = load('qAnalysisExpA_RNA.out');
 %
-ni = 10;
+ni = 5;
 nj = ni;
 nk = 100;
 %
 ninj = ni*nj;
-p = 7; % ponto
+p = 2; % ponto
 %
 % dado do modelo
 qm3D = reshape(qm,ni,nj,nk);
