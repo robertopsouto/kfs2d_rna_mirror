@@ -104,7 +104,8 @@ CONTAINS
         
         !Calculo dos divergentes na direcao x
 !$OMP DO
-        do j = 1, nj - 1 
+        do j = 1, nj - 1
+!DIR$ IVDEP 
            do i = 1, ni - 1 
                 divx(i,j)  = cx * (uGl(i+1, j) - uGl(i, j))
             enddo
@@ -120,6 +121,7 @@ CONTAINS
         !Calculo dos divergentes na direcao y
 !$OMP DO        
         do j = 1, nj - 1 !j = coluna
+!DIR$ IVDEP 
             do i = 1, ni !i = linha
                 divy(i, j)  = cy * (vGl(i, j+1) - vGl(i, j))
             enddo
@@ -134,6 +136,7 @@ CONTAINS
 
 !$OMP DO
         do j = 1, nj-1 !j = coluna
+!DIR$ IVDEP 
             do i = 1, ni !i = linha
                 qGl(i,j) = qGl(i,j) + real(dt) *(-(real(Hmean)) * (divx(i,j) + divy(i,j)) - (rq * qGl(i,j)))
             enddo
@@ -142,6 +145,7 @@ CONTAINS
 
 !$OMP DO
         do j = 1, nj-1 ! j = coluna
+!DIR$ IVDEP 
             do i = 2, ni !i = linha
                 dqdx(i,j) = cx * (qGl(i,j) - qGl(i-1,j))
             enddo
@@ -156,6 +160,7 @@ CONTAINS
 
 !$OMP DO
         do j = 2, nj-1 !j = coluna
+!DIR$ IVDEP 
             do i = 1, ni !i = linha
                 dqdy(i,j)= cy * (qGl(i,j) - qGl(i,j-1))
             enddo
@@ -164,6 +169,7 @@ CONTAINS
 
 !$OMP DO
         do j = 2, nj-1!j = coluna
+!DIR$ IVDEP 
             do i = 1, ni-1 !i = linha
                 ubar(i,j) = 0.25 * (uGl(i+1,j) + uGl(i,j) + uGl(i+1,j-1) + uGl(i,j-1))
             enddo
@@ -178,6 +184,7 @@ CONTAINS
 
 !$OMP DO
         do j = 1, nj-1 !i = linha
+!DIR$ IVDEP 
             do i = 2, ni !j = coluna
                 vbar(i,j) = 0.25 * (vGl(i,j+1) + vGl(i,j) + vGl(i-1,j+1) + vGl(i-1,j))
             enddo
@@ -193,6 +200,7 @@ CONTAINS
 !$OMP DO        
         !Atualizando u
         do j = 1, nj-1 !j = coluna
+!DIR$ IVDEP 
             do i  = 1, ni !i = linha
                 uGl(i,j) = uGl(i,j) + real(dt) *(f * vbar(i,j) - g * dqdx(i,j) - ru * uGl(i,j) + Fu)
             enddo
@@ -202,6 +210,7 @@ CONTAINS
         !Atualiza v
 !$OMP DO        
         do j = 2, nj-1 !j= coluna
+!DIR$ IVDEP 
             do i = 1, ni !i = linha    
                 vGl(i,j) = vGl(i,j) + real(dt) * (-f * ubar(i,j) - g * dqdy(i,j) - rv * vGl(i,j) + Fv)
             enddo
