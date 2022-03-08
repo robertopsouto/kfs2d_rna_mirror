@@ -93,7 +93,7 @@ REAL*8  :: rhoAir
 REAL*8  :: zonalW
 REAL*8  :: rhoWatter
 REAL*8  :: uExtForce, vExtForce
-REAL*8  :: randNoise
+REAL*8  :: randNoise, rand
 REAL*8  :: initialModel2DTime, endModel2DTime, totalModel2DTime
 REAL*8  :: initialFKTime, endFKTime, totalFKTime
 REAL*8  :: initialANNTime, endANNTime, totalANNTime

@@ -29,11 +29,13 @@ neuronNumber=${9}
 #starttime=starttime_${DATE}
 
 module load sequana/current
+module load intel_psxe/2019_sequana
 module load python/3.8.2_sequana 
-module load gcc/8.3_sequana 
+module load openmpi/gnu/2.1.6-gcc-8.3-cuda_sequana
 source /scratch/cenapadrjsd/rpsouto/sequana/usr/local/spack/git/spack/share/spack/setup-env.sh
-spack load -r openblas
-spack load -r gperftools
+export SPACK_USER_CONFIG_PATH=/scratch/cenapadrjsd/rpsouto/.spack/v0.17.1
+spack load openblas
+spack load gperftools
 export MALLOCSTATS=1
 
 resultsdir=resultados/percNoise_$percNoise
