@@ -93,7 +93,7 @@ REAL*8  :: rhoAir
 REAL*8  :: zonalW
 REAL*8  :: rhoWatter
 REAL*8  :: uExtForce, vExtForce
-REAL*8  :: randNoise
+REAL*8  :: randNoise, rand
 REAL*8  :: initialModel2DTime, endModel2DTime, totalModel2DTime
 REAL*8  :: initialFKTime, endFKTime, totalFKTime
 REAL*8  :: initialANNTime, endANNTime, totalANNTime
@@ -843,10 +843,13 @@ do tS = 1, timeStep
 !$OMP PARALLEL DO         &
 !$OMP DEFAULT(shared)     &
 !$OMP PRIVATE(sX,sY,i,tid)                 
-            do sX = 1, gridX
-                do sY = 1, gridY
+            !do sX = 1, gridX
+                !do sY = 1, gridY
+                do i = 1, gridX*gridY 
                    tid = omp_get_thread_num() + 1
-                   i = (sX-1)*gridY + sY
+                   SX = i/gridX + 1
+                   SY = i - (SX-1)*gridX + 1
+                   !i = (sX-1)*gridY + sY
                    xANN(1,i) = qModelnorm(sX,sY,tS)
                    xANN(2,i) = qObservnorm(sX,sY,tS)
                    vco(:,1,tid) = matmul(wqco(:,:),xANN(:,i))
@@ -857,7 +860,7 @@ do tS = 1, timeStep
                    ycs(:,1,tid) = (1.d0-DEXP(-vcs(:,1,tid)))/(1.d0+DEXP(-vcs(:,1,tid)))
                    qGl(sX,sY) = (ycs(1,1,tid)*(qModelMax-qModelMin) + qModelMax + qModelMin)/2.0 
                 enddo
-            enddo
+            !enddo
 !$OMP END PARALLEL DO
             endANNTime = omp_get_wtime()
             totalANNTime = totalANNTime + (endANNTime - initialANNTime)
