@@ -840,25 +840,25 @@ do tS = 1, timeStep
 	        !print*,'TUDO PRONTO PARA A RNA'
 
             initialANNTime = omp_get_wtime()
-!$OMP PARALLEL DO         &
-!$OMP DEFAULT(shared)     &
-!$OMP PRIVATE(sX,sY,i,tid)                 
-            do sX = 1, gridX
-                do sY = 1, gridY
+!$OMP PARALLEL DEFAULT(shared) PRIVATE(sX,sY,i,tid)
+!$OMP DO SCHEDULE(STATIC,gridX) 
+                do i = 1, gridX*gridY
+                   !i = (sX-1)*gridY + sY
                    tid = omp_get_thread_num() + 1
-                   i = (sX-1)*gridY + sY
+                   SX = i/gridX + 1
+                   SY = i - (SX-1)*gridX + 1
                    xANN(1,i) = qModelnorm(sX,sY,tS)
                    xANN(2,i) = qObservnorm(sX,sY,tS)
                    vco(:,1,tid) = matmul(wqco(:,:),xANN(:,i))
                    vco(:,1,tid) = vco(:,1,tid) - (bqco(:,1))
-                   yco(:,1,tid) = (1.d0-DEXP(-vco(:,1,tid)))/(1.d0+DEXP(-vco(:,1,tid)))
+                   yco(:,1,tid) = (1.d0 - DEXP(-vco(:,1,tid))) / (1.d0 + DEXP(-vco(:,1,tid)))
                    vcs(:,1,tid) = matmul(wqcs(:,:), yco(:,1,tid))
                    vcs(:,1,tid) = vcs(:,1,tid) - bqcs(:,1)
                    ycs(:,1,tid) = (1.d0-DEXP(-vcs(:,1,tid)))/(1.d0+DEXP(-vcs(:,1,tid)))
-                   qGl(sX,sY) = (ycs(1,1,tid)*(qModelMax-qModelMin) + qModelMax + qModelMin)/2.0 
+                   qGl(sX,sY) = (ycs(1,1,tid)*(qModelMax-qModelMin) + qModelMax + qModelMin)/2.0
                 enddo
-            enddo
-!$OMP END PARALLEL DO
+!$OMP END DO NOWAIT
+!$OMP END PARALLEL
             endANNTime = omp_get_wtime()
             totalANNTime = totalANNTime + (endANNTime - initialANNTime)
            
