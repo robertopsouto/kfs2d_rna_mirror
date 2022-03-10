@@ -19,8 +19,8 @@ percNoise=${8}
 neuronNumber=${9}
 numthreads=${10}
 
-#DATE=$(date +%Y-%m-%d-%H%M%S)
-#starttime=starttime_${DATE}
+DATE=$(date +%Y-%m-%d-%H%M%S)
+starttime=starttime_${DATE}
 
 export OMP_NUM_THREADS=${numthreads}
 
@@ -50,18 +50,18 @@ if [[ ${assimType} -eq 1 ]]; then
   cp output.log ${resultsdir}/${outputdir}/output_FK.log
 fi
 
-if [[ ${assimType} -eq 2 && -d ${resultsdir}/$outputdir ]]; then
-  echo "Copiando o resultado da assimilacao de FK emulada por RNA."
-  cp output/full/qModelExpA.out ${resultsdir}/${outputdir}/full/
-  cp output/full/qObservExpA.out ${resultsdir}/${outputdir}/full/
-  cp output/full/qAnalysisExpA.out ${resultsdir}/${outputdir}/full/
-  cp output/full/qAnalysisExpA_RNA.out ${resultsdir}/${outputdir}/full/qAnalysisExpA_RNA-neuronNumber_${neuronNumber}.out
-  if [[ -L ${resultsdir}/${outputdir}/full/qAnalysisExpA_RNA.out ]]; then
-	  rm ${resultsdir}/${outputdir}/full/qAnalysisExpA_RNA.out
+if [[ ${assimType} -eq 2 ]]; then
+  if [[ ! -d $resultsdir/$outputdir ]]; then
+     mkdir -p $resultsdir/$outputdir
   fi
-  ln -s -r ${resultsdir}/${outputdir}/full/qAnalysisExpA_RNA-neuronNumber_${neuronNumber}.out ${resultsdir}/${outputdir}/full/qAnalysisExpA_RNA.out
-  cp output/computingANNTime.out ${resultsdir}/${outputdir}/computingANNTime-neuronNumber_${neuronNumber}.out
-  cp output.log ${resultsdir}/${outputdir}/output_RNA-neuronNumber_${neuronNumber}.log
+  echo "Copiando o resultado da assimilacao de FK emulada por RNA."
+  echo "mkdir -p ${resultsdir}/${outputdir}/full/omp-${numthreads}/job-${starttime}"
+  mkdir -p ${resultsdir}/${outputdir}/full/omp-${numthreads}/job-${starttime}
+  cp output/full/qModelExpA.out ${resultsdir}/${outputdir}/full/omp-${numthreads}/job-${starttime}/
+  cp output/full/qObservExpA.out ${resultsdir}/${outputdir}/full/omp-${numthreads}/job-${starttime}/
+  cp output/full/qAnalysisExpA.out ${resultsdir}/${outputdir}/full/omp-${numthreads}/job-${starttime}/
+  cp output/full/qAnalysisExpA_RNA.out ${resultsdir}/${outputdir}/full/omp-${numthreads}/job-${starttime}/
+  cp output.log ${resultsdir}/${outputdir}/full/omp-${numthreads}/job-${starttime}/
 fi
 
 

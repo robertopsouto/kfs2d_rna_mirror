@@ -842,14 +842,14 @@ do tS = 1, timeStep
             initialANNTime = omp_get_wtime()
 !$OMP PARALLEL DEFAULT(shared) PRIVATE(sX,sY,i,tid)
 !$OMP DO SCHEDULE(STATIC,gridX) 
-                do i = 1, gridX*gridY
+                do i = 0, gridX*gridY-1
                    !i = (sX-1)*gridY + sY
                    tid = omp_get_thread_num() + 1
                    SX = i/gridX + 1
                    SY = i - (SX-1)*gridX + 1
-                   xANN(1,i) = qModelnorm(sX,sY,tS)
-                   xANN(2,i) = qObservnorm(sX,sY,tS)
-                   vco(:,1,tid) = matmul(wqco(:,:),xANN(:,i))
+                   xANN(1,i+1) = qModelnorm(sX,sY,tS)
+                   xANN(2,i+1) = qObservnorm(sX,sY,tS)
+                   vco(:,1,tid) = matmul(wqco(:,:),xANN(:,i+1))
                    vco(:,1,tid) = vco(:,1,tid) - (bqco(:,1))
                    yco(:,1,tid) = (1.d0 - DEXP(-vco(:,1,tid))) / (1.d0 + DEXP(-vco(:,1,tid)))
                    vcs(:,1,tid) = matmul(wqcs(:,:), yco(:,1,tid))
