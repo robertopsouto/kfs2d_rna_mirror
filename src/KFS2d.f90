@@ -845,7 +845,7 @@ do tS = 1, timeStep
 !$OMP PRIVATE(sX,sY,i,tid)                 
             !do sX = 1, gridX
                 !do sY = 1, gridY
-                do i = 1, gridX*gridY 
+                do i = 0, gridX*gridY 
                    tid = omp_get_thread_num() + 1
                    SX = i/gridX + 1
                    SY = i - (SX-1)*gridX + 1
