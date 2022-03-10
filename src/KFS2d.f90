@@ -155,7 +155,7 @@ DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:,:) :: ycs
 
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:) :: error
 
-DOUBLE PRECISION :: qModelMax, qModelMin
+DOUBLE PRECISION :: qModelMax, qModelMin, qObservMax, qObservMin
 
 INTEGER :: numThreads, tid, omp_get_num_threads, omp_get_thread_num
 DOUBLE PRECISION :: omp_get_wtime
@@ -368,14 +368,14 @@ ALLOCATE(ycs(1,1,numThreads))
 
 !Normalization
 ALLOCATE(qObservnorm(gridX,gridY,timeStep))
-ALLOCATE(uObservnorm(gridX,gridY,timeStep))
-ALLOCATE(vObservnorm(gridX,gridY,timeStep))
+!ALLOCATE(uObservnorm(gridX,gridY,timeStep))
+!ALLOCATE(vObservnorm(gridX,gridY,timeStep))
 ALLOCATE(qModelnorm(gridX,gridY,timeStep))
-ALLOCATE(uModelnorm(gridX,gridY,timeStep))
-ALLOCATE(vModelnorm(gridX,gridY,timeStep))
+!ALLOCATE(uModelnorm(gridX,gridY,timeStep))
+!ALLOCATE(vModelnorm(gridX,gridY,timeStep))
 ALLOCATE(qAnalysisnorm(gridX,gridY,timeStep))
-ALLOCATE(uAnalysisnorm(gridX,gridY,timeStep))
-ALLOCATE(vAnalysisnorm(gridX,gridY,timeStep))
+!ALLOCATE(uAnalysisnorm(gridX,gridY,timeStep))
+!ALLOCATE(vAnalysisnorm(gridX,gridY,timeStep))
 
 !**************************************************************************************
 if (assimType .eq. 2) then !Assimilacao com RNA
@@ -619,23 +619,25 @@ freqAssim = freqObsT
 
 qModelMax = maxval(qModel)
 qModelMin = minval(qModel)
+qObservMax= maxval(qObserv)
+qObservMin= minval(qObserv)
 !**************************************************************************************
 ! Processo de normalizacao dos dados para serem usados na RNA
 
 if (assimType .EQ. 2) then
     print*, 'Normalizando os dados para RNA'
-    qModelnorm = (maxval(qModel) * valNormInf - minval(qModel) * valNormSup + qModel * &
-		&(valNormSup - valNormInf)) / (maxval(qModel) - minval(qModel))
-    qObservnorm = (maxval(qObserv) * valNormInf - minval(qObserv) * valNormSup + qObserv * &
-		&(valNormSup - valNormInf)) / (maxval(qObserv) - minval(qObserv))
-    uModelnorm = (maxval(uModel) * valNormInf - minval(uModel) * valNormSup + uModel * &
-                &(valNormSup - valNormInf)) / (maxval(uModel) - minval(uModel))
-    uObservnorm = (maxval(uObserv) * valNormInf - minval(uObserv) * valNormSup + uObserv * &
-                &(valNormSup - valNormInf)) / (maxval(uObserv) - minval(uObserv))
-    vModelnorm = (maxval(vModel) * valNormInf - minval(vModel) * valNormSup + vModel * &
-                &(valNormSup - valNormInf)) / (maxval(vModel) - minval(vModel))
-    vObservnorm = (maxval(vObserv) * valNormInf - minval(vObserv) * valNormSup + vObserv * &
-                &(valNormSup - valNormInf)) / (maxval(vObserv) - minval(vObserv))
+    qModelnorm = (qModelMax * valNormInf - qModelMin * valNormSup + qModel * &
+		&(valNormSup - valNormInf)) / (qModelMax - qModelMin)
+    qObservnorm = (qObservMax * valNormInf - qObservMin * valNormSup + qObserv * &
+		&(valNormSup - valNormInf)) / (qObservMax - qObservMin)
+    !uModelnorm = (maxval(uModel) * valNormInf - minval(uModel) * valNormSup + uModel * &
+    !            &(valNormSup - valNormInf)) / (maxval(uModel) - minval(uModel))
+    !uObservnorm = (maxval(uObserv) * valNormInf - minval(uObserv) * valNormSup + uObserv * &
+    !            &(valNormSup - valNormInf)) / (maxval(uObserv) - minval(uObserv))
+    !vModelnorm = (maxval(vModel) * valNormInf - minval(vModel) * valNormSup + vModel * &
+    !            &(valNormSup - valNormInf)) / (maxval(vModel) - minval(vModel))
+    !vObservnorm = (maxval(vObserv) * valNormInf - minval(vObserv) * valNormSup + vObserv * &
+    !            &(valNormSup - valNormInf)) / (maxval(vObserv) - minval(vObserv))
 endif
 
 !**************************************************************************************
