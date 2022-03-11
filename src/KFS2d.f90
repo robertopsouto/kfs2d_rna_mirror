@@ -148,10 +148,10 @@ DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: wqco
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: bqcoAux, bqco
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: wqcs
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: bqcs
-DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:,:) :: vco
-DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:,:) :: vcs
-DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:,:) :: yco
-DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:,:) :: ycs
+DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: vco
+DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: vcs
+DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: yco
+DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: ycs
 
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:) :: error
 
@@ -361,10 +361,10 @@ print*
 print*, "numThreads: ", numThreads
 print*
 
-ALLOCATE(vco(neuronNumber,1,numThreads))
-ALLOCATE(vcs(1,1,numThreads))
-ALLOCATE(yco(neuronNumber,1,numThreads))
-ALLOCATE(ycs(1,1,numThreads))
+ALLOCATE(vco(neuronNumber,1))
+ALLOCATE(vcs(1,1))
+ALLOCATE(yco(neuronNumber,1))
+ALLOCATE(ycs(1,1))
 
 !Normalization
 ALLOCATE(qObservnorm(gridX,gridY,timeStep))
@@ -842,22 +842,22 @@ do tS = 1, timeStep
 	        !print*,'TUDO PRONTO PARA A RNA'
 
             initialANNTime = omp_get_wtime()
-!$OMP PARALLEL DEFAULT(shared) PRIVATE(sX,sY,i,tid)
+!$OMP PARALLEL DEFAULT(shared) PRIVATE(sX,sY,i,tid,vco,yco,vcs,ycs)
 !$OMP DO SCHEDULE(STATIC,gridX) 
                 do i = 0, gridX*gridY-1
                    !i = (sX-1)*gridY + sY
-                   tid = omp_get_thread_num() + 1
-                   SX = i/gridX + 1
-                   SY = i - (SX-1)*gridX + 1
+                   !tid = omp_get_thread_num() + 1
+                   sX = i/gridX + 1
+                   sY = i - (sX-1)*gridX + 1
                    xANN(1,i+1) = qModelnorm(sX,sY,tS)
                    xANN(2,i+1) = qObservnorm(sX,sY,tS)
-                   vco(:,1,tid) = matmul(wqco(:,:),xANN(:,i+1))
-                   vco(:,1,tid) = vco(:,1,tid) - (bqco(:,1))
-                   yco(:,1,tid) = (1.d0 - DEXP(-vco(:,1,tid))) / (1.d0 + DEXP(-vco(:,1,tid)))
-                   vcs(:,1,tid) = matmul(wqcs(:,:), yco(:,1,tid))
-                   vcs(:,1,tid) = vcs(:,1,tid) - bqcs(:,1)
-                   ycs(:,1,tid) = (1.d0-DEXP(-vcs(:,1,tid)))/(1.d0+DEXP(-vcs(:,1,tid)))
-                   qGl(sX,sY) = (ycs(1,1,tid)*(qModelMax-qModelMin) + qModelMax + qModelMin)/2.0
+                   vco(:,1) = matmul(wqco(:,:),xANN(:,i+1))
+                   vco(:,1) = vco(:,1) - (bqco(:,1))
+                   yco(:,1) = (1.d0 - DEXP(-vco(:,1))) / (1.d0 + DEXP(-vco(:,1)))
+                   vcs(:,1) = matmul(wqcs(:,:), yco(:,1))
+                   vcs(:,1) = vcs(:,1) - bqcs(:,1)
+                   ycs(:,1) = (1.d0-DEXP(-vcs(:,1)))/(1.d0+DEXP(-vcs(:,1)))
+                   qGl(sX,sY) = (ycs(1,1)*(qModelMax-qModelMin) + qModelMax + qModelMin)/2.0
                 enddo
 !$OMP END DO NOWAIT
 !$OMP END PARALLEL
