@@ -155,7 +155,7 @@ DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:,:) :: ycs
 
 DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:) :: error
 
-DOUBLE PRECISION :: qModelMax, qModelMin
+DOUBLE PRECISION :: qModelMax, qModelMin, qObservMax, qObservMin
 
 INTEGER :: numThreads, tid, omp_get_num_threads, omp_get_thread_num
 DOUBLE PRECISION :: omp_get_wtime
@@ -368,14 +368,14 @@ ALLOCATE(ycs(1,1,numThreads))
 
 !Normalization
 ALLOCATE(qObservnorm(gridX,gridY,timeStep))
-ALLOCATE(uObservnorm(gridX,gridY,timeStep))
-ALLOCATE(vObservnorm(gridX,gridY,timeStep))
+!ALLOCATE(uObservnorm(gridX,gridY,timeStep))
+!ALLOCATE(vObservnorm(gridX,gridY,timeStep))
 ALLOCATE(qModelnorm(gridX,gridY,timeStep))
-ALLOCATE(uModelnorm(gridX,gridY,timeStep))
-ALLOCATE(vModelnorm(gridX,gridY,timeStep))
+!ALLOCATE(uModelnorm(gridX,gridY,timeStep))
+!ALLOCATE(vModelnorm(gridX,gridY,timeStep))
 ALLOCATE(qAnalysisnorm(gridX,gridY,timeStep))
-ALLOCATE(uAnalysisnorm(gridX,gridY,timeStep))
-ALLOCATE(vAnalysisnorm(gridX,gridY,timeStep))
+!ALLOCATE(uAnalysisnorm(gridX,gridY,timeStep))
+!ALLOCATE(vAnalysisnorm(gridX,gridY,timeStep))
 
 !**************************************************************************************
 if (assimType .eq. 2) then !Assimilacao com RNA
@@ -619,23 +619,25 @@ freqAssim = freqObsT
 
 qModelMax = maxval(qModel)
 qModelMin = minval(qModel)
+qObservMax= maxval(qObserv)
+qObservMin= minval(qObserv)
 !**************************************************************************************
 ! Processo de normalizacao dos dados para serem usados na RNA
 
 if (assimType .EQ. 2) then
     print*, 'Normalizando os dados para RNA'
-    qModelnorm = (maxval(qModel) * valNormInf - minval(qModel) * valNormSup + qModel * &
-		&(valNormSup - valNormInf)) / (maxval(qModel) - minval(qModel))
-    qObservnorm = (maxval(qObserv) * valNormInf - minval(qObserv) * valNormSup + qObserv * &
-		&(valNormSup - valNormInf)) / (maxval(qObserv) - minval(qObserv))
-    uModelnorm = (maxval(uModel) * valNormInf - minval(uModel) * valNormSup + uModel * &
-                &(valNormSup - valNormInf)) / (maxval(uModel) - minval(uModel))
-    uObservnorm = (maxval(uObserv) * valNormInf - minval(uObserv) * valNormSup + uObserv * &
-                &(valNormSup - valNormInf)) / (maxval(uObserv) - minval(uObserv))
-    vModelnorm = (maxval(vModel) * valNormInf - minval(vModel) * valNormSup + vModel * &
-                &(valNormSup - valNormInf)) / (maxval(vModel) - minval(vModel))
-    vObservnorm = (maxval(vObserv) * valNormInf - minval(vObserv) * valNormSup + vObserv * &
-                &(valNormSup - valNormInf)) / (maxval(vObserv) - minval(vObserv))
+    qModelnorm = (qModelMax * valNormInf - qModelMin * valNormSup + qModel * &
+		&(valNormSup - valNormInf)) / (qModelMax - qModelMin)
+    qObservnorm = (qObservMax * valNormInf - qObservMin * valNormSup + qObserv * &
+		&(valNormSup - valNormInf)) / (qObservMax - qObservMin)
+    !uModelnorm = (maxval(uModel) * valNormInf - minval(uModel) * valNormSup + uModel * &
+    !            &(valNormSup - valNormInf)) / (maxval(uModel) - minval(uModel))
+    !uObservnorm = (maxval(uObserv) * valNormInf - minval(uObserv) * valNormSup + uObserv * &
+    !            &(valNormSup - valNormInf)) / (maxval(uObserv) - minval(uObserv))
+    !vModelnorm = (maxval(vModel) * valNormInf - minval(vModel) * valNormSup + vModel * &
+    !            &(valNormSup - valNormInf)) / (maxval(vModel) - minval(vModel))
+    !vObservnorm = (maxval(vObserv) * valNormInf - minval(vObserv) * valNormSup + vObserv * &
+    !            &(valNormSup - valNormInf)) / (maxval(vObserv) - minval(vObserv))
 endif
 
 !**************************************************************************************
@@ -840,28 +842,25 @@ do tS = 1, timeStep
 	        !print*,'TUDO PRONTO PARA A RNA'
 
             initialANNTime = omp_get_wtime()
-!$OMP PARALLEL DO         &
-!$OMP DEFAULT(shared)     &
-!$OMP PRIVATE(sX,sY,i,tid)                 
-            !do sX = 1, gridX
-                !do sY = 1, gridY
-                do i = 0, gridX*gridY 
+!$OMP PARALLEL DEFAULT(shared) PRIVATE(sX,sY,i,tid)
+!$OMP DO SCHEDULE(STATIC,gridX) 
+                do i = 0, gridX*gridY-1
+                   !i = (sX-1)*gridY + sY
                    tid = omp_get_thread_num() + 1
                    SX = i/gridX + 1
                    SY = i - (SX-1)*gridX + 1
-                   !i = (sX-1)*gridY + sY
-                   xANN(1,i) = qModelnorm(sX,sY,tS)
-                   xANN(2,i) = qObservnorm(sX,sY,tS)
-                   vco(:,1,tid) = matmul(wqco(:,:),xANN(:,i))
+                   xANN(1,i+1) = qModelnorm(sX,sY,tS)
+                   xANN(2,i+1) = qObservnorm(sX,sY,tS)
+                   vco(:,1,tid) = matmul(wqco(:,:),xANN(:,i+1))
                    vco(:,1,tid) = vco(:,1,tid) - (bqco(:,1))
                    yco(:,1,tid) = (1.d0 - DEXP(-vco(:,1,tid))) / (1.d0 + DEXP(-vco(:,1,tid)))
                    vcs(:,1,tid) = matmul(wqcs(:,:), yco(:,1,tid))
                    vcs(:,1,tid) = vcs(:,1,tid) - bqcs(:,1)
                    ycs(:,1,tid) = (1.d0-DEXP(-vcs(:,1,tid)))/(1.d0+DEXP(-vcs(:,1,tid)))
-                   qGl(sX,sY) = (ycs(1,1,tid)*(qModelMax-qModelMin) + qModelMax + qModelMin)/2.0 
+                   qGl(sX,sY) = (ycs(1,1,tid)*(qModelMax-qModelMin) + qModelMax + qModelMin)/2.0
                 enddo
-            !enddo
-!$OMP END PARALLEL DO
+!$OMP END DO NOWAIT
+!$OMP END PARALLEL
             endANNTime = omp_get_wtime()
             totalANNTime = totalANNTime + (endANNTime - initialANNTime)
            
