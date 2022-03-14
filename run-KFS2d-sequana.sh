@@ -73,7 +73,11 @@ if [[ ${assimType} -eq 1 ]]; then
   cp output/training/*.out ${resultsdir}/${outputdir}/training/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}/
 fi
 
-if [[ ${assimType} -eq 2 && -d ${resultsdir}/${outputdir} ]]; then
+#if [[ ${assimType} -eq 2 && -d ${resultsdir}/${outputdir} ]]; then
+if [[ ${assimType} -eq 2 ]]; then
+  if [[ ! -d $resultsdir/$outputdir ]]; then
+     mkdir -p $resultsdir/$outputdir
+  fi
   echo "Copiando o resultado da assimilacao de FK emulada por RNA."
   mkdir -p ${resultsdir}/${outputdir}/full/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}
   cp output/full/qObservExpA.out       ${resultsdir}/${outputdir}/full/omp-${SLURM_CPUS_PER_TASK}/job-${SLURM_JOB_ID}/
