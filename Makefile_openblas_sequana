@@ -1,0 +1,33 @@
+#Compilador
+#FC = /usr/local/bin/gfortran
+FC = gfortran
+#Opcoes de compilacao
+FFLAGS = -c -O2 -fopenmp
+
+#Opcoes de compilacao
+FFLAGSOPT = -O2 -fopenmp 
+
+#OPENBLASDIR=/scratch/cenapadrjsd/rpsouto/sequana/usr/local/spack/git/spack/opt/spack/linux-rhel7-skylake_avx512/gcc-8.3.0/openblas-0.3.17-ck6hcqpjimnteey7ar3bua6qtomuqojz
+#GPERTOOLSDIR=/scratch/cenapadrjsd/rpsouto/sequana/usr/local/spack/git/spack/opt/spack/linux-rhel7-skylake_avx512/gcc-8.3.0/gperftools-2.8.1-eczyaml7mrzlei5mg5rproixn4ouedbn
+OPENBLASDIR=/scratch/cenapadrjsd/rpsouto/sequana/usr/local/spack/git/spack/opt/spack/linux-rhel7-skylake_avx512/gcc-8.3.0/openblas-0.3.18-5f2tf32umzl2f33wua4ar3x24b2c25dc
+GPERTOOLSDIR=/scratch/cenapadrjsd/rpsouto/sequana/usr/local/spack/git/spack/opt/spack/linux-rhel7-skylake_avx512/gcc-8.3.0/gperftools-2.9.1-skljana22mzekw6jbdooq2dcffhevmpw
+
+#Bibliotecas
+#FFLIBS = -llapack -lblas -g -fcheck=all -Wall -fbacktrace -fopenmp #-tcmalloc-minimal4 
+FFLIBS = -I$(OPENBLASDIR)/include -L$(OPENBLASDIR)/lib -lopenblas \
+         -g -fcheck=all -Wall -fbacktrace -fopenmp -lm
+
+#Objetos
+objects = kfsFunctions.o KFS2d.o
+
+KFS2d:$(objects)
+	$(FC) -o ./KFS2d $(objects) $(FFLIBS)
+
+KFS2d.o:
+	gfortran -O2 -c -g -fopenmp ./src/KFS2d.f90
+
+kfsFunctions.o:
+	gfortran -O2 -c -g -fopenmp ./src/kfsFunctions.f90
+
+clean:
+	rm -rf ./src/*.mod *.o KFS2d *.mod *.o *.out
