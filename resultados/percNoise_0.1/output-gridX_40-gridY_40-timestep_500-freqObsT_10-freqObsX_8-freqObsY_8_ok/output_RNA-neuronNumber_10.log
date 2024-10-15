@@ -1,0 +1,225 @@
+ ./KFS2d 2 40 40 500 10 8 8 0.1 10
+ command_argument_count():            9
+ freqObsX: 8     
+ freqObsY: 8     
+ percNoise: 0.1   
+ neuronNumber: 10    
+ SALVOU CONDICAO INICIAL - qInitialCondExpA.out
+ SALVOU RESULTADO DA INTEGRACAO DO MODELO - qModelExpA.out
+ Gerou o ruido que sera adicionado ao modelo - gerando as observacoes 
+ SALVOU AS OBSERVACOES -- MODELO + Rand - qObservExpA.out
+ Inicializou a freqAssim
+ Inicializando as matrizes 1
+ Inicializando as matrizes 2
+ Inicializando as matrizes 3
+ Inicializando as matrizes 4
+ Inicializando as matrizes 5
+ Inicializando as matrizes 6
+ Inicializando as matrizes 7
+ Inicializando as matrizes 8
+ Inicializando as matrizes 9
+ Inicializando as matrizes 10
+ Completando as matrizes com valores apropriados
+ Normalizando os dados para RNA
+ ANN Assimilation cycle - timeStep          10
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    6.1400000000011445E-004          10
+ ANN Assimilation cycle - timeStep          20
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.2200000000013347E-004          20
+ ANN Assimilation cycle - timeStep          30
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.5900000000042027E-004          30
+ ANN Assimilation cycle - timeStep          40
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.3400000000003445E-004          40
+ ANN Assimilation cycle - timeStep          50
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.4400000000009996E-004          50
+ ANN Assimilation cycle - timeStep          60
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    4.9600000000005195E-004          60
+ ANN Assimilation cycle - timeStep          70
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.0699999999981316E-004          70
+ ANN Assimilation cycle - timeStep          80
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.5899999999997618E-004          80
+ ANN Assimilation cycle - timeStep          90
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    7.8099999999992065E-004          90
+ ANN Assimilation cycle - timeStep         100
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    1.0590000000001432E-003         100
+ ANN Assimilation cycle - timeStep         110
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    1.0440000000002669E-003         110
+ ANN Assimilation cycle - timeStep         120
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.7200000000001694E-004         120
+ ANN Assimilation cycle - timeStep         130
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    6.5399999999993241E-004         130
+ ANN Assimilation cycle - timeStep         140
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    7.0700000000023522E-004         140
+ ANN Assimilation cycle - timeStep         150
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.4299999999996018E-004         150
+ ANN Assimilation cycle - timeStep         160
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.7000000000018147E-004         160
+ ANN Assimilation cycle - timeStep         170
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.3100000000005920E-004         170
+ ANN Assimilation cycle - timeStep         180
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.1700000000032276E-004         180
+ ANN Assimilation cycle - timeStep         190
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.1500000000004320E-004         190
+ ANN Assimilation cycle - timeStep         200
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.3499999999973014E-004         200
+ ANN Assimilation cycle - timeStep         210
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.7499999999999218E-004         210
+ ANN Assimilation cycle - timeStep         220
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.3299999999989467E-004         220
+ ANN Assimilation cycle - timeStep         230
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.7699999999982765E-004         230
+ ANN Assimilation cycle - timeStep         240
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    8.0999999999997740E-004         240
+ ANN Assimilation cycle - timeStep         250
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    8.8899999999991763E-004         250
+ ANN Assimilation cycle - timeStep         260
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.7200000000001694E-004         260
+ ANN Assimilation cycle - timeStep         270
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    4.9799999999988742E-004         270
+ ANN Assimilation cycle - timeStep         280
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    4.9299999999963262E-004         280
+ ANN Assimilation cycle - timeStep         290
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.2699999999994418E-004         290
+ ANN Assimilation cycle - timeStep         300
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.3599999999986991E-004         300
+ ANN Assimilation cycle - timeStep         310
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    6.3799999999991641E-004         310
+ ANN Assimilation cycle - timeStep         320
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    8.1799999999976336E-004         320
+ ANN Assimilation cycle - timeStep         330
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    9.6700000000016217E-004         330
+ ANN Assimilation cycle - timeStep         340
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    8.5399999999991039E-004         340
+ ANN Assimilation cycle - timeStep         350
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    6.2700000000015521E-004         350
+ ANN Assimilation cycle - timeStep         360
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.1399999999990342E-004         360
+ ANN Assimilation cycle - timeStep         370
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.9899999999979414E-004         370
+ ANN Assimilation cycle - timeStep         380
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    6.6100000000002268E-004         380
+ ANN Assimilation cycle - timeStep         390
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.5100000000019023E-004         390
+ ANN Assimilation cycle - timeStep         400
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.5600000000000094E-004         400
+ ANN Assimilation cycle - timeStep         410
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.8199999999963836E-004         410
+ ANN Assimilation cycle - timeStep         420
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.5800000000028049E-004         420
+ ANN Assimilation cycle - timeStep         430
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    6.6399999999999793E-004         430
+ ANN Assimilation cycle - timeStep         440
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    4.7599999999992093E-004         440
+ ANN Assimilation cycle - timeStep         450
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    5.2299999999982916E-004         450
+ ANN Assimilation cycle - timeStep         460
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    4.7500000000022524E-004         460
+ ANN Assimilation cycle - timeStep         470
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    4.7700000000006071E-004         470
+ ANN Assimilation cycle - timeStep         480
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    4.7700000000006071E-004         480
+ ANN Assimilation cycle - timeStep         490
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    4.7199999999980591E-004         490
+ ANN Assimilation cycle - timeStep         500
+ TUDO PRONTO PARA A RNA
+ PASSAMOS PELA RNA
+ ANN Assimilation time:    4.7499999999978115E-004         500
+ Total Process time:    4.1781129999999997     
+ FIM

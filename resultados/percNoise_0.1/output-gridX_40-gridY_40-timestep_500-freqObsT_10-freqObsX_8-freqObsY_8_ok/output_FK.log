@@ -1,0 +1,824 @@
+ ./KFS2d 1 40 40 500 10 8 8 0.1 10
+ command_argument_count():            9
+ freqObsX: 8     
+ freqObsY: 8     
+ percNoise: 0.1   
+ neuronNumber: 10    
+ SALVOU CONDICAO INICIAL - qInitialCondExpA.out
+ SALVOU RESULTADO DA INTEGRACAO DO MODELO - qModelExpA.out
+ Gerou o ruido que sera adicionado ao modelo - gerando as observacoes 
+ SALVOU AS OBSERVACOES -- MODELO + Rand - qObservExpA.out
+ Inicializou a freqAssim
+ Inicializando as matrizes 1
+ Inicializando as matrizes 2
+ Inicializando as matrizes 3
+ Inicializando as matrizes 4
+ Inicializando as matrizes 5
+ Inicializando as matrizes 6
+ Inicializando as matrizes 7
+ Inicializando as matrizes 8
+ Inicializando as matrizes 9
+ Inicializando as matrizes 10
+ Completando as matrizes com valores apropriados
+ FK Assimilation cycle - timeStep          10
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    401.75131299999998               10
+ FK Assimilation cycle - timeStep          20
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    378.32623199999995               20
+ FK Assimilation cycle - timeStep          30
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    380.92333300000007               30
+ FK Assimilation cycle - timeStep          40
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    376.89760699999988               40
+ FK Assimilation cycle - timeStep          50
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    379.54198399999996               50
+ FK Assimilation cycle - timeStep          60
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    379.75372399999992               60
+ FK Assimilation cycle - timeStep          70
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    379.29250200000024               70
+ FK Assimilation cycle - timeStep          80
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    378.47096800000008               80
+ FK Assimilation cycle - timeStep          90
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    382.52283399999988               90
+ FK Assimilation cycle - timeStep         100
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    383.20607800000016              100
+ FK Assimilation cycle - timeStep         110
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    384.37841299999945              110
+ FK Assimilation cycle - timeStep         120
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    1163.2049909999996              120
+ FK Assimilation cycle - timeStep         130
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    875.91178899999977              130
+ FK Assimilation cycle - timeStep         140
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    859.57290300000022              140
+ FK Assimilation cycle - timeStep         150
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    842.65165399999933              150
+ FK Assimilation cycle - timeStep         160
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    828.70967299999938              160
+ FK Assimilation cycle - timeStep         170
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    829.75930499999959              170
+ FK Assimilation cycle - timeStep         180
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    823.56024699999944              180
+ FK Assimilation cycle - timeStep         190
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    828.46776900000077              190
+ FK Assimilation cycle - timeStep         200
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    824.61236400000053              200
+ FK Assimilation cycle - timeStep         210
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    813.36350200000015              210
+ FK Assimilation cycle - timeStep         220
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    825.64193700000033              220
+ FK Assimilation cycle - timeStep         230
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    816.92935600000055              230
+ FK Assimilation cycle - timeStep         240
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    821.70710999999937              240
+ FK Assimilation cycle - timeStep         250
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    820.03082499999982              250
+ FK Assimilation cycle - timeStep         260
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    822.27989600000001              260
+ FK Assimilation cycle - timeStep         270
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    821.72613199999978              270
+ FK Assimilation cycle - timeStep         280
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    828.74749199999860              280
+ FK Assimilation cycle - timeStep         290
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    827.32917200000156              290
+ FK Assimilation cycle - timeStep         300
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    822.64570099999764              300
+ FK Assimilation cycle - timeStep         310
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    830.77772700000060              310
+ FK Assimilation cycle - timeStep         320
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    825.90640100000019              320
+ FK Assimilation cycle - timeStep         330
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    813.50203300000067              330
+ FK Assimilation cycle - timeStep         340
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    825.14815499999895              340
+ FK Assimilation cycle - timeStep         350
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    822.11279799999829              350
+ FK Assimilation cycle - timeStep         360
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    825.79856600000130              360
+ FK Assimilation cycle - timeStep         370
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    823.93805799999973              370
+ FK Assimilation cycle - timeStep         380
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    827.75151200000255              380
+ FK Assimilation cycle - timeStep         390
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    819.74296100000356              390
+ FK Assimilation cycle - timeStep         400
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    819.40495200000078              400
+ FK Assimilation cycle - timeStep         410
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    819.18603099999746              410
+ FK Assimilation cycle - timeStep         420
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    823.70464500000162              420
+ FK Assimilation cycle - timeStep         430
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    824.16502599999876              430
+ FK Assimilation cycle - timeStep         440
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    816.03295699999944              440
+ FK Assimilation cycle - timeStep         450
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    816.76629299999695              450
+ FK Assimilation cycle - timeStep         460
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    820.38370899999791              460
+ FK Assimilation cycle - timeStep         470
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    824.89616000000387              470
+ FK Assimilation cycle - timeStep         480
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    856.06611999999586              480
+ FK Assimilation cycle - timeStep         490
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    851.75013400000171              490
+ FK Assimilation cycle - timeStep         500
+ Primeira chamada dgemm
+ Passou pela equacao 3.60
+ Segunda chamada dgemm
+ Terceira chamada dgemm
+ Invertendo matriz
+ Store A in Ainv
+ Ainv = A
+ call DGETRF
+ Quarta chamada dgemm
+ Quinta chamada dgemm
+ Passou pela equacao 3.61
+ Passou pela equacao 3.62
+ Passou pela equacao 3.63
+ passou pela equacao 3.64
+ FK Assimilation time:    862.17997700000706              500
+ Total Process time:    36855.170286000000     
+ FIM
